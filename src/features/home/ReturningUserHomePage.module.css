@@ -299,6 +299,7 @@
   	line-height: 120%;
   	z-index: 1;
   	flex-shrink: 0;
+	color: white
 }
 .section-daily-quiz-card {
   	position: absolute;

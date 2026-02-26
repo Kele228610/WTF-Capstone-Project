@@ -53,6 +53,7 @@ import Module1AssessmentPage from '../features/assessments/Module1AssessmentPage
 import ProgressTrackerPage from '../features/progress/ProgressTrackerPage';
 import AchievementsPage from '../features/achievements/AchievementsPage';
 import SettingsPage from '../features/settings/SettingsPage';
+import ProfilePage from '../features/profile/ProfilePage';
 // import Dashboard from '../features/home/Dashboard';
 
 import '../styles/global.css';
@@ -84,6 +85,7 @@ const App = () => {
         <Route path="/progress-tracker" element={<ProgressTrackerPage />} />
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
       </Routes>
     </Router>

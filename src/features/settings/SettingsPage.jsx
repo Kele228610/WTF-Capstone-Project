@@ -18,8 +18,8 @@ import Icon14 from '../../assets/icons/Icon-14.svg';
 import Icon15 from '../../assets/icons/Icon-15.svg';
 import Icon16 from '../../assets/icons/Icon-16.svg';
 
-const ChevronRow = ({ iconSrc, iconAlt, title, subtitle }) => (
-  <button type="button" className={styles.rowButton}>
+const ChevronRow = ({ iconSrc, iconAlt, title, subtitle, onClick }) => (
+  <button type="button" className={styles.rowButton} onClick={onClick}>
     <div className={styles.rowLeft}>
       <div className={styles.iconBox}>
         <img className={styles.iconImage} src={iconSrc} alt={iconAlt} />
@@ -89,7 +89,12 @@ const SettingsPage = () => {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>ACCOUNT</h2>
           <div className={styles.card}>
-            <ChevronRow iconSrc={Icon1} iconAlt="Profile" title="Profile" />
+            <ChevronRow
+              iconSrc={Icon1}
+              iconAlt="Profile"
+              title="Profile"
+              onClick={() => navigate('/profile')}
+            />
             <ChevronRow iconSrc={Icon2} iconAlt="Email" title="Email" />
             <ChevronRow iconSrc={Icon3} iconAlt="Password" title="Password" />
             <ChevronRow iconSrc={Icon4} iconAlt="Linked Accounts" title="Linked Accounts" />

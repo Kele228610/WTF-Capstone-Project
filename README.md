@@ -1,17 +1,67 @@
-# React + Vite
+﻿# WTF-Capstone-Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Offline-first React learning platform built with Vite.
 
-Currently, two official plugins are available:
+## Tech Stack
+- React 19
+- React Router
+- Vite
+- vite-plugin-pwa (Workbox)
+- CSS Modules
+- react-hook-form
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting Started
+### Prerequisites
+- Node.js 18+
+- npm 9+
 
-## React Compiler
+### Install
+```bash
+npm install
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Run Development Server
+```bash
+npm run dev
+```
 
-## Expanding the ESLint configuration
+### Build for Production
+```bash
+npm run build
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# WTF-Capstone-Project
+### Preview Production Build
+```bash
+npm run preview
+```
+
+### Lint
+```bash
+npm run lint
+```
+
+## Current Routes
+Defined in `src/app/routes.jsx`:
+- `/` -> Home page
+- `/signin` -> Sign in page
+
+## PWA / Offline Support
+Configured in `vite.config.js` using `vite-plugin-pwa`:
+- Auto service worker registration and updates
+- App manifest (`EduLearn Offline`)
+- Installed app icons from `/public`
+- Workbox fallback to `/index.html`
+
+## Project Structure
+```text
+src/
+  app/                # app bootstrapping and routing
+  components/         # reusable UI and layout components
+  features/           # feature pages (home, auth, lessons, settings, etc.)
+  assets/             # icons and images
+  styles/             # global/reset/theme variables
+public/               # static PWA assets
+```
+
+## Repository
+Remote: `https://github.com/Kele228610/WTF-Capstone-Project.git`

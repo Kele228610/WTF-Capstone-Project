@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './ProfilePage.module.css';
-import UserProfileImage from '../../assets/images/User3.png';
+import UserProfile from '../../assets/images/User Profile.png';
 import Icon16 from '../../assets/icons/Icon-16.svg';
 
 const stats = [
@@ -56,7 +56,7 @@ const ProfilePage = () => {
       <main className={styles.main}>
         <section className={styles.profileBlock}>
           <div className={styles.avatarWrap}>
-            <img className={styles.avatar} src={UserProfileImage} alt="Winnie Jones" />
+            <img className={styles.avatar} src={UserProfile} alt="Winnie Jones" />
             <button type="button" className={styles.editAvatarButton} aria-label="Edit profile photo">
               &#9998;
             </button>

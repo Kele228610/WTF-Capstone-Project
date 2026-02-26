@@ -1,0 +1,440 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.28);
+  z-index: 50;
+}
+
+.aside-sidebar-drawer-navigat {
+  width: min(320px, 86vw);
+  height: 100%;
+  position: relative;
+  border-radius: 0 12px 12px 0;
+  background-color: #f1f2f4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  isolation: isolate;
+  text-align: left;
+  font-size: 18px;
+  color: #475569;
+  font-family: "Material Icons Round";
+}
+
+.aside-sidebar-drawer-navigat2 {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0);
+  z-index: 0;
+}
+
+.drawer-header-user-profile {
+  align-self: stretch;
+  height: 141px;
+  position: relative;
+  border-radius: 0 12px 0 0;
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  box-sizing: border-box;
+  z-index: 1;
+  color: #0f172a;
+  font-family: Montserrat, sans-serif;
+}
+
+.close-button {
+  position: absolute;
+  top: 36px;
+  left: 276px;
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Material Icons Round";
+  font-size: 10px;
+  line-height: 10px;
+  color: #0f172a;
+  z-index: 4;
+
+}
+
+.container {
+  position: absolute;
+  width: calc(100% - 48px);
+  top: 50px;
+  right: 24px;
+  left: 24px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  
+}
+
+.container2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  isolation: isolate;
+}
+
+.user-profile-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 9999px;
+  background: #124cc9;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  z-index: 0;
+}
+
+.backgroundborder {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  margin: 0 !important;
+  right: 0;
+  bottom: 0;
+  border-radius: 9999px;
+  background-color: #22c55e; 
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+.container3 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heading-2 {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.winnie-jones {
+  position: relative;
+  line-height: 28px;
+}
+
+.container4 {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.senior-high-student {
+  position: relative;
+  line-height: 120%;
+}
+
+.navigation-list {
+  align-self: stretch;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px 12px;
+  z-index: 2;
+  font-size: 14px;
+}
+
+.list {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-home-active-link {
+  align-self: stretch;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  /* background-color: #b0c6f8; */
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  min-height: 44px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  /* color: #124cc9; */
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.margin {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 16px 0 0;
+  font-size: 22px;
+}
+
+.homeicon {
+  	width: 22px;
+  	height: 22px;
+  	position: relative;
+  	font-size: 22px;
+  	line-height: 22px;
+  	font-family: 'Material Icons Round';
+  	color: #124cc9;
+  	text-align: left;
+  	display: flex;
+  	align-items: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.subjectsicon {
+  	width: 22px;
+  	height: 22px;
+  	position: relative;
+  	font-size: 22px;
+  	line-height: 22px;
+  	font-family: 'Material Icons Round';
+  	color: #124cc9;
+  	text-align: left;
+  	display: flex;
+  	align-items: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.progressicon {
+  	width: 22px;
+  	height: 22px;
+  	position: relative;
+  	font-size: 22px;
+  	line-height: 22px;
+  	font-family: 'Material Icons Round';
+  	color: #124cc9;
+  	text-align: left;
+  	display: flex;
+  	align-items: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.achievementsicon {
+  	width: 22px;
+  	height: 22px;
+  	position: relative;
+  	font-size: 22px;
+  	line-height: 22px;
+  	font-family: 'Material Icons Round';
+  	color: #124cc9;
+  	text-align: left;
+  	display: flex;
+  	align-items: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.settingsicon {
+  	width: 22px;
+  	height: 22px;
+  	position: relative;
+  	font-size: 22px;
+  	line-height: 22px;
+  	font-family: 'Material Icons Round';
+  	color: #124cc9;
+  	text-align: left;
+  	display: flex;
+  	align-items: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+} 
+
+.signouticon {
+  	width: 22px;
+  	height: 22px;
+  	position: relative;
+  	font-size: 22px;
+  	line-height: 22px;
+  	font-family: 'Material Icons Round';
+  	color: #475569;
+  	text-align: center;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+    margin-right: 15px;
+}
+
+.container5 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: Montserrat, sans-serif;
+}
+
+.home {
+  position: relative;
+  font-size: 14px;
+  line-height: 120%;
+  font-weight: 600;
+  font-family: Montserrat;
+  color: #124cc9;
+  text-align: left;
+
+
+}
+
+.container6 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #b0c6f8;
+}
+
+/* .text2 {
+  width: 14px;
+  height: 20px;
+  position: relative;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+} */
+
+.item-curriculum-link {
+  align-self: stretch;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  min-height: 44px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* .chevronrighticon {
+  width: 14px;
+  height: 14px;
+} */
+
+.item-home-active-link:hover,
+.item-curriculum-link:hover {
+  background-color: #b0c6f8;
+  transform: translateX(4px);
+  box-shadow: 0 8px 16px -12px rgba(15, 23, 42, 0.6);
+}
+
+/* .chevronbutton {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.chevronrighticon {
+  width: 14px;
+  height: 14px;
+}
+ */
+
+.horizontal-divider {
+  width: 100%;
+  height: 1px;
+  position: relative;
+  border-top: 1px solid #e2e8f0;
+  box-sizing: border-box;
+}
+
+.drawer-footer {
+  align-self: stretch;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  z-index: 3;
+  text-align: center;
+  font-size: 22px;
+}
+
+.button {
+  align-self: stretch;
+  border-radius: 8px;
+  border: 0;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.container15 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.text11 {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  line-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.container16 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  font-family: Montserrat, sans-serif;
+}
+
+.sign-out {
+  width: 69.7px;
+  height: 24px;
+  position: relative;
+  line-height: 120%;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

@@ -1,0 +1,117 @@
+.page {
+  background-color: var(--color-light-gray, #f8fafc);
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 24px 32px;
+  box-sizing: border-box;
+}
+
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 48px;
+} 
+
+.mainSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.2;
+  color: var(--color-dark-slate, #1e293b);
+  margin: 0;
+}
+
+/* Divider */
+.divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--color-border, #f1f5f9);
+}
+
+.dividerText {
+  position: relative;
+  background-color: var(--color-light-gray, #f8fafc);
+  padding: 0 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-text-light, #94a3b8);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.footerText {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-text-light, #94a3b8);
+  margin: 0;
+}
+
+.footerLink {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-primary-blue, #124cc9);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footerLink:hover {
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page {
+    padding: 32px 16px 24px;
+  }
+
+  .headerSection {
+    margin-bottom: 32px;
+  }
+
+  .mainSection {
+    gap: 24px;
+  }
+
+  .pageTitle {
+    font-size: 24px;
+  }
+}

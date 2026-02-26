@@ -1,0 +1,499 @@
+.formContainer {
+  padding: 16px 24px;
+  max-width: 448px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.heading {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+}
+
+.subheading {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #475569;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.passwordField {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.passwordStrength {
+  margin-top: -16px;
+  margin-bottom: 8px;
+}
+
+.strengthHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.strengthLabel {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  color: #94a3b8;
+  line-height: 15px;
+}
+
+.strengthValue {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 15px;
+}
+
+.strengthBar {
+  width: 100%;
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 21053300px;
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 21053300px;
+}
+
+.termsContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 8px 0;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  background-color: #f8fafc;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.termsLabel {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.link {
+  color: #124cc9;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 20px;
+  background-color: #124cc9;
+  color: #f8fafc;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0px 10px 15px -3px rgba(176, 198, 248, 0.1), 0px 4px 6px -4px rgba(43, 238, 108, 0.2);
+  transition: background-color 0.2s;
+  line-height: 1.2;
+}
+
+.submitButton:hover {
+  background-color: #0f3a9f;
+}
+
+.submitButton:active {
+  transform: translateY(1px);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #e2e8f0;
+}
+
+.dividerText {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #94a3b8;
+  padding: 0 16px;
+  background-color: #f8fafc;
+  line-height: 1.2;
+}
+
+.socialButtons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.socialButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px;
+  background-color: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f172a;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  line-height: 1.2;
+}
+
+.socialButton:hover {
+  background-color: #f1f5f9;
+}
+
+.socialIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.footer {
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.2;
+}
+
+.footerText {
+  font-weight: 400;
+}
+
+.onboardingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.44);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1200;
+}
+
+.onboardingCard {
+  width: min(390px, 100%);
+  border-radius: 22px;
+  background: #f4f6fb;
+  overflow: hidden;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.26);
+  border: 1px solid #dce4f0;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 10px;
+}
+
+.stepLabel {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #1f56d1;
+}
+
+.stepPercent {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #8ea0b9;
+}
+
+.progressTrack {
+  margin: 0 24px;
+  height: 6px;
+  border-radius: 999px;
+  background: #dbe3ef;
+  overflow: hidden;
+}
+
+.progressFill {
+  width: 35%;
+  height: 100%;
+  border-radius: 999px;
+  background: #1f56d1;
+}
+
+.promptRow {
+  margin: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.promptIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #b7caf0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #124cc9;
+  font-weight: 700;
+}
+
+.promptBubble {
+  flex: 1;
+  background: #e8edf4;
+  border-radius: 20px;
+  padding: 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #1a2337;
+  line-height: 1.3;
+}
+
+.levelOption {
+  width: calc(100% - 48px);
+  margin: 0 24px 14px;
+  border: 1px solid #dde5f1;
+  border-radius: 18px;
+  background: #edf1f7;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.levelOptionActive {
+  border-color: #5e8eed;
+  box-shadow: 0 8px 18px rgba(33, 89, 208, 0.2);
+  background: #f1f5fd;
+}
+
+.levelIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #dce6f8;
+  color: #4f7de6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.levelCopy {
+  flex: 1;
+}
+
+.levelTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a2337;
+}
+
+.levelSubtitle {
+  margin-top: 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #95a5bc;
+}
+
+.radio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #d2dce8;
+  box-sizing: border-box;
+}
+
+.radioActive {
+  border-color: #4f7de6;
+  box-shadow: inset 0 0 0 5px #ffffff, 0 0 0 1px #4f7de6;
+  background: #4f7de6;
+}
+
+.onboardingFooter {
+  margin-top: 18px;
+  border-top: 1px solid #e1e8f2;
+  padding: 20px 18px 22px;
+}
+
+.continueButton {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  background: #1f56d1;
+  color: #f8fafc;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 20px rgba(31, 86, 209, 0.25);
+}
+
+.subjectsGrid {
+  padding: 0 24px 4px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.subjectCard {
+  border: 1px solid #dde5f1;
+  border-radius: 14px;
+  background: #edf1f7;
+  min-height: 104px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.subjectCardActive {
+  background: #1f56d1;
+  border-color: #1f56d1;
+  box-shadow: 0 8px 18px rgba(33, 89, 208, 0.22);
+}
+
+.subjectIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e6ecf7;
+  color: #3b6fdc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.subjectIconActive {
+  background: rgba(248, 250, 252, 0.18);
+  color: #f8fafc;
+}
+
+.subjectTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a2337;
+}
+
+.subjectCardActive .subjectTitle {
+  color: #f8fafc;
+}
+
+.goalsList {
+  padding: 0 24px 4px;
+}
+
+.goalOption {
+  width: 100%;
+  margin: 0 0 14px;
+  border: 1px solid #dde5f1;
+  border-radius: 20px;
+  background: #edf1f7;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.goalOptionActive {
+  border-color: #2c67e5;
+  box-shadow: 0 8px 18px rgba(33, 89, 208, 0.2);
+  background: #f4f8ff;
+}
+
+.goalIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.goalIconGreen {
+  background: #a8efc8;
+  color: #0c6f36;
+}
+
+.goalIconBlue {
+  background: #b7caf0;
+  color: #2f63d6;
+}
+
+.goalIconRed {
+  background: #f6b8b8;
+  color: #c12020;
+}
+
+@media (max-width: 420px) {
+  .stepLabel {
+    font-size: 18px;
+  }
+
+  .stepPercent {
+    font-size: 14px;
+  }
+
+  .levelTitle {
+    font-size: 17px;
+  }
+
+  .subjectTitle {
+    font-size: 16px;
+  }
+}

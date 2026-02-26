@@ -1,0 +1,72 @@
+.container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.socialButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 16px;
+  background-color: transparent;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.socialButton:hover {
+  background-color: var(--color-input-bg, #f1f5f9);
+  border-color: var(--color-text-light, #94a3b8);
+}
+
+.socialButton:active {
+  transform: scale(0.98);
+}
+
+.socialButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(18, 76, 201, 0.1);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.buttonText {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-dark-slate, #0f172a);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    gap: 12px;
+  }
+
+  .socialButton {
+    padding: 12px 14px;
+  }
+
+  .buttonText {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .socialButton {
+    width: 100%;
+  }
+}

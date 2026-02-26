@@ -1,0 +1,531 @@
+.page {
+  min-height: 100vh;
+  background: #f2f4f8;
+  color: #1b2438;
+  font-family: Montserrat, sans-serif;
+}
+
+.header {
+  height: 72px;
+  background: #f7f9fc;
+  border-bottom: 1px solid #d8deea;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconButton {
+  border: 0;
+  background: transparent;
+  color: #1a2337;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.brand {
+  font-size: 20px;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.notificationIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 14px 12px 28px;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topAction {
+  border: 0;
+  background: transparent;
+  color: #1f2a41;
+  font-size: 24px;
+}
+
+.title {
+  margin: 8px 0 6px;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.15;
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  color: #97a6bc;
+  font-size: clamp(16px, 2.6vw, 28px);
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.questionCard {
+  background: transparent;
+}
+
+.questionHead {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.qNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #e9edf5;
+  color: #2a62da;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.qText {
+  margin: 0;
+  font-size: clamp(18px, 2.4vw, 34px);
+  line-height: 1.2;
+}
+
+.optionsGrid {
+  margin-left: 38px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.option,
+.optionSelected,
+.optionWrong {
+  border: 0;
+  border-radius: 8px;
+  background: #e9edf2;
+  color: #3a4456;
+  text-align: left;
+  padding: 12px 12px;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(14px, 1.7vw, 24px);
+}
+
+.optionSelected {
+  background: #7ea2ea;
+  color: #1a2f61;
+}
+
+.optionWrong {
+  background: #eb9ca1;
+  color: #7a131d;
+}
+
+.helperText {
+  margin: 14px 0 10px 38px;
+  color: #8b9cb4;
+  font-size: clamp(12px, 1.6vw, 20px);
+}
+
+.submitButton {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: #1f56d1;
+  color: #fff;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(22px, 3.2vw, 38px);
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(31, 86, 209, 0.28);
+}
+
+.failedText {
+  margin: 10px 0 0;
+  color: #b42318;
+  font-size: clamp(13px, 1.4vw, 18px);
+}
+
+.syncText {
+  text-align: center;
+  color: #8b9cb4;
+  margin-top: 14px;
+  font-size: clamp(12px, 1.6vw, 20px);
+}
+
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.44);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.popupCard {
+  width: min(680px, 95vw);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  border-radius: clamp(24px, 5vw, 48px);
+  background: #f4f6fb;
+  padding: clamp(18px, 3vw, 30px);
+  text-align: center;
+}
+
+.popupTitle {
+  margin: 0;
+  color: #16213b;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+.scoreRingWrap {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.scoreRing {
+  --score-deg: 324deg;
+  width: clamp(160px, 23vw, 220px);
+  height: clamp(160px, 23vw, 220px);
+  border-radius: 50%;
+  background: conic-gradient(#1f56d1 0 var(--score-deg), #d6dce7 var(--score-deg) 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scoreRingFail {
+  background: conic-gradient(#f31313 0 var(--score-deg), #d6dce7 var(--score-deg) 360deg);
+}
+
+.scoreRingInner {
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  background: #f4f6fb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.popupScore {
+  margin: 0;
+  font-size: clamp(42px, 7vw, 64px);
+  line-height: 1;
+  font-weight: 700;
+  color: #131e3a;
+}
+
+.popupScoreFail {
+  color: #e96f73;
+}
+
+.scoreLabel {
+  margin: 8px 0 0;
+  color: #8ea0ba;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.popupHeading {
+  margin: 24px 0 0;
+  color: #121c35;
+  font-size: 25px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.popupSubtext {
+  margin: 10px auto 0;
+  max-width: 520px;
+  color: #8da0b9;
+  font-size: 22px;
+  line-height: 1.22;
+}
+
+.popupStats {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.statCard {
+  background: #f0f4fa;
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+  text-align: left;
+  padding: 14px;
+}
+
+.statTop {
+  margin: 0;
+  color: #8090a8;
+  font-size: 14px;
+}
+
+.statValue {
+  margin: 14px 0 0;
+  color: #131e38;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.statCaption {
+  margin: 8px 0 0;
+  color: #6f8099;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.badgeCard {
+  margin-top: 14px;
+  border: 1px solid #93b1ef;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #eaf0fb 0%, #eef3ff 100%);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+
+.badgeIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 20px;
+  background: #1f56d1;
+  padding: 14px 14px 18px;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 18px rgba(31, 86, 209, 0.22);
+}
+
+.badgeLabel {
+  margin: 0;
+  color: #1f56d1;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.badgeTitle {
+  margin: 4px 0 0;
+  color: #131f3b;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.breakdownCard {
+  margin-top: 14px;
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+  background: #f0f4fa;
+  text-align: left;
+  padding: 14px;
+}
+
+.breakdownLabel {
+  margin: 0;
+  color: #91a1b7;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+.breakdownRow {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.breakdownTitle {
+  margin: 0;
+  color: #121c36;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.breakdownScore {
+  margin: 0;
+  color: #1f56d1;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.breakdownTrack {
+  margin-top: 12px;
+  height: 8px;
+  width: 100%;
+  border-radius: 999px;
+  background: #182947;
+  overflow: hidden;
+}
+
+.breakdownFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #1f56d1;
+}
+
+.breakdownTrackFail {
+  background: #efb7ba;
+}
+
+.breakdownFillFail {
+  background: #e96f73;
+}
+
+.popupActions {
+  margin-top: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.popupPrimaryButton,
+.popupSecondaryButton,
+.popupTertiaryButton {
+  width: 100%;
+  border-radius: 14px;
+  padding: 14px 14px;
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: clamp(16px, 1.8vw, 28px);
+}
+
+.popupPrimaryButton {
+  border: 0;
+  background: #1f56d1;
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(31, 86, 209, 0.25);
+}
+
+.popupSecondaryButton {
+  border: 1px solid #1a2740;
+  background: #f4f6fb;
+  color: #425267;
+}
+
+.popupTertiaryButton {
+  border: 0;
+  background: transparent;
+  color: #97a8bf;
+}
+
+@media (max-width: 768px) {
+  .header {
+    height: 72px;
+    padding: 0 14px;
+  }
+
+  .brand {
+    font-size: 20px;
+  }
+
+  .main {
+    padding: 14px 12px 24px;
+  }
+
+  .optionsGrid {
+    margin-left: 38px;
+    gap: 8px;
+  }
+
+  .popupOverlay {
+    padding: 12px;
+  }
+
+  .popupCard {
+    width: min(460px, 100%);
+    max-height: calc(100vh - 24px);
+  }
+}
+
+@media (max-width: 480px) {
+  .questionHead {
+    grid-template-columns: 24px 1fr;
+    gap: 8px;
+  }
+
+  .qNumber {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .optionsGrid {
+    margin-left: 32px;
+    gap: 8px;
+  }
+
+  .option,
+  .optionSelected,
+  .optionWrong {
+    padding: 10px 10px;
+  }
+
+  .helperText {
+    margin-left: 32px;
+  }
+
+  .popupCard {
+    border-radius: 40px;
+    padding: 22px 14px 18px;
+  }
+
+  .popupTitle {
+    font-size: 20px;
+  }
+
+  .popupHeading {
+    font-size: 24px;
+  }
+
+  .popupSubtext {
+    font-size: 18px;
+  }
+
+  .statValue {
+    font-size: 28px;
+  }
+
+  .badgeTitle {
+    font-size: 28px;
+  }
+
+  .breakdownTitle {
+    font-size: 24px;
+  }
+
+  .popupPrimaryButton,
+  .popupSecondaryButton,
+  .popupTertiaryButton {
+    font-size: 16px;
+  }
+}

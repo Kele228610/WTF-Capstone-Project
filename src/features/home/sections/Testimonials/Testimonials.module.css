@@ -1,0 +1,142 @@
+.testimonials {
+  padding: var(--spacing-5xl) var(--container-padding);
+  background: var(--color-gray-100);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+}
+
+/* Testimonials Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-3xl);
+}
+
+/* User Avatars */
+.avatars {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 48px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-white);
+  overflow: hidden;
+  position: absolute;
+  background: var(--color-white);
+}
+
+.avatar:nth-child(1) {
+  left: 0;
+  z-index: 3;
+}
+
+.avatar:nth-child(2) {
+  left: 40px;
+  z-index: 2;
+}
+
+.avatar:nth-child(3) {
+  left: 80px;
+  z-index: 1;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.count {
+  position: absolute;
+  left: 120px;
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary-blue);
+  border: 2px solid var(--color-white);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.count span {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  color: var(--color-white);
+}
+
+/* Rating Stars */
+.stars {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.stars .material-icons {
+  font-size: 24px;
+  color: var(--color-star-gold);
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  color: var(--color-gray-600);
+  margin: 0;
+}
+
+/* Testimonials Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xl);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .testimonials {
+    padding: var(--spacing-4xl) var(--container-padding-mobile);
+  }
+
+  .avatars {
+    height: auto;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .avatar {
+    position: relative;
+    left: auto !important;
+    top: auto;
+  }
+
+  .count {
+    position: relative;
+    left: auto;
+    margin-top: var(--spacing-sm);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--font-size-h2);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-sm);
+  }
+}

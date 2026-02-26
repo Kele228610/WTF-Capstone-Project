@@ -1,0 +1,351 @@
+.page {
+  min-height: 100vh;
+  background: #f2f4f8;
+  color: #182033;
+  font-family: Montserrat, sans-serif;
+}
+
+.header {
+  height: 80px;
+  background: #f8fafc;
+  border-bottom: 1px solid #d8dee8;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.iconButton {
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+  color: #19233a;
+  line-height: 1;
+}
+
+.brand {
+  	position: relative;
+  	font-size: 24px;
+  	line-height: 120%;
+  	font-family: Montserrat;
+  	color: #0f172a;
+  	text-align: center;
+}
+
+.notificationIcon {
+  /* width: 26px;
+  height: 26px; */
+  
+  	height: 32px;
+  	width: 24px;
+  	position: relative;
+  	font-size: 24px;
+  	line-height: 32px;
+  	font-weight: 100;
+  	font-family: 'Material Symbols Outlined';
+  	color: #0f172a;
+  	text-align: center;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+}
+
+
+.main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 18px 16px 32px;
+}
+
+.backButton {
+  border: 0;
+  background: transparent;
+  font-size: 30px;
+  color: #30384b;
+  margin-bottom: 10px;
+}
+
+.courseCard {
+  border: 1px solid #9cbcff;
+  border-radius: 24px;
+  background: #f2f4f8;
+  padding: 20px;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pill {
+  background: #d6dde8;
+  color: #1658d8;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.scienceflaskIcon{
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid #d8e0eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #E2E8F0;
+  color: #315aa8;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.progressRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progressLabel {
+  color: #8a98b1;
+  font-size: 14px;
+}
+
+.progressValue {
+  color: #1658d8;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 12px;
+  border-radius: 9999px;
+  background: #e2e6ec;
+  overflow: hidden;
+}
+
+.progressFill {
+  width: 35%;
+  height: 100%;
+  background: #1d4fbc;
+}
+
+.sectionTitle {
+  margin: 26px 2px 16px;
+  font-size: 18px;
+}
+
+.moduleCard {
+  border: 1px solid #9cbcff;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #f2f4f8;
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.moduleNumber {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.moduleTitle {
+  flex: 1;
+  font-size: 20px;
+}
+
+.chevron {
+  color: #1f5ce0;
+  font-size: 24px;
+  transition: transform 0.2s ease;
+}
+
+.chevronButton {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.chevronOpen {
+  transform: rotate(0deg);
+}
+
+.chevronClosed {
+  transform: rotate(180deg);
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #e4e9f2;
+  border-top: 1px solid #d7deea;
+}
+
+.lessonRowActive {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  /* background: #b8c8ee; */
+  background: lightblue;
+}
+
+.notesIcon,
+.lessonIconPlay,
+.lessonIconLock {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2b63df;
+}
+
+.lessonBody {
+  flex: 1;
+}
+
+.lessonName {
+  font-size: 18px;
+}
+
+.lessonNameActive {
+  font-size: 18px;
+  color: #1f5ce0;
+}
+
+.lessonMeta {
+  color: #8a98b1;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.completedOk {
+  color: #3abf74;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.downloadBad {
+  color: #e05858;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.statusDone {
+  color: #18a66d;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.statusCircle {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #1f5ce0;
+  border-radius: 50%;
+}
+
+.lock {
+  color: grey
+}
+
+.moduleCollapsed {
+  margin-top: 16px;
+  border-radius: 22px;
+  background: #e8ecf3;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.moduleNumberMuted {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #d8e0eb;
+  color: #90a0b6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.moduleMutedText {
+  flex: 1;
+  color: #374153;
+  font-size: 18px;
+}
+
+.chevronMuted {
+  color: #8ea0ba;
+  font-size: 22px;
+}
+
+.footerAction {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+
+.nextButton {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 30px;
+  background: #1f5ce0;
+  color: #fff;
+  font-size: 24px;
+  font-family: Montserrat, sans-serif;
+}
+
+@media (max-width: 768px) {
+  /* .brand {
+    font-size: 40px;
+  } */
+
+  .title {
+    font-size: 24px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+  }
+
+  .progressLabel,
+  .progressValue {
+    font-size: 26px;
+  }
+}

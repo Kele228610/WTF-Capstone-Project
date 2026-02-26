@@ -1,0 +1,407 @@
+.page {
+  min-height: 100vh;
+  background: #f2f4f8;
+  color: #1c2437;
+  font-family: Montserrat, sans-serif;
+}
+
+.page img {
+  max-width: 100%;
+  height: auto;
+}
+
+.header {
+  height: 72px;
+  background: #f7f9fc;
+  border-bottom: 1px solid #d8deea;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconButton {
+  border: 0;
+  background: transparent;
+  color: #1a2337;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.brand {
+  font-size: 20px;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.notificationIcon {
+  width: 22px;
+}
+
+.main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 14px 12px 28px;
+}
+
+.backButton {
+  border: 0;
+  background: transparent;
+  color: #2b3347;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.lessonHeadingRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.lessonHeadingBar {
+  width: 3px;
+  height: 22px;
+  background: #4f7de9;
+}
+
+.lessonHeading {
+  margin: 0;
+  font-size: clamp(20px, 4.8vw, 34px);
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.videoCard {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+  margin-bottom: 16px;
+}
+
+.videoImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.85) brightness(0.84);
+}
+
+.playOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  opacity: 0.86;
+  font-size: 44px;
+}
+
+.videoControls {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #d9e0ee;
+  font-size: 12px;
+}
+
+.controlMini {
+  font-size: 11px;
+}
+
+.timeline {
+  flex: 1;
+  height: 4px;
+  background: rgba(208, 218, 236, 0.45);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.timelineFill {
+  width: 45%;
+  height: 100%;
+  background: #9db3e2;
+}
+
+.timeText {
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.notesSection {
+  margin-bottom: 14px;
+}
+
+.headerContainer,
+.knowledgeContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.downloadButton {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 0 0 0 8px;
+  cursor: pointer;
+}
+
+.downloadIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.downloadText {
+  margin: 0;
+  color: #1f56d1;
+  font-size: clamp(12px, 2.3vw, 14px);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.notesIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: clamp(18px, 4vw, 38px);
+  line-height: 1.2;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.noteCard {
+  background: #e8edf5;
+  border-radius: 12px;
+  padding: 12px;
+  color: #4f596d;
+  font-size: 15px;
+  line-height: 1.34;
+}
+
+.quizCard {
+  border: 1.5px solid #9cbcff;
+  border-radius: 12px;
+  padding: 14px 12px 14px;
+  background: #f2f4f8;
+}
+
+.question {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: #353d4f;
+}
+
+.option,
+.optionActive {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #d8dfec;
+  background: #eef2f7;
+  color: #4d586f;
+  text-align: left;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-family: Montserrat, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  min-height: 48px;
+}
+
+.optionActive {
+  background: #d7e1f7;
+  border-color: #4d7dee;
+  color: #2c63de;
+  font-weight: 700;
+}
+
+.radio,
+.radioActive {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid #9cadc7;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.radioActive {
+  border-color: #4d7dee;
+  box-shadow: inset 0 0 0 4px #4d7dee;
+  background: #eaf0ff;
+}
+
+.option:hover,
+.optionActive:hover {
+  transform: translateX(3px);
+}
+
+.option:hover .radio,
+.optionActive:hover .radio,
+.option:hover .radioActive,
+.optionActive:hover .radioActive {
+  transform: translateX(2px) scale(1.05);
+}
+
+.submitButton {
+  margin-top: 8px;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: #1f56d1;
+  color: #fff;
+  padding: 12px 14px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: Montserrat, sans-serif;
+}
+
+.bottomActions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.outlineButton,
+.primaryButton {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: 600;
+  font-family: Montserrat, sans-serif;
+}
+
+.outlineButton {
+  border: 1.5px solid #1f56d1;
+  color: #1f56d1;
+  background: transparent;
+}
+
+.outlineButton:hover {
+  background: #f8fafc;
+}
+
+.primaryButton {
+  border: 0;
+  background: #1f56d1;
+  color: #fff;
+}
+
+@media (min-width: 640px) {
+  .header {
+    height: 78px;
+    padding: 0 18px;
+  }
+
+  .brand {
+    font-size: 26px;
+  }
+
+  .notificationIcon {
+    width: 24px;
+  }
+
+  .main {
+    padding: 16px 16px 32px;
+  }
+
+  .lessonHeading {
+    font-size: 30px;
+  }
+
+  .sectionTitle {
+    font-size: 34px;
+  }
+
+  .videoImage {
+    height: 220px;
+  }
+
+  .bottomActions {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .outlineButton,
+  .primaryButton {
+    min-width: 180px;
+    width: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    max-width: 980px;
+    padding: 20px 24px 40px;
+  }
+
+  .lessonHeading {
+    font-size: 34px;
+  }
+
+  .sectionTitle {
+    font-size: 38px;
+  }
+
+  .videoImage {
+    height: 290px;
+  }
+
+  .quizCard,
+  .noteCard {
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .header {
+    padding: 0 10px;
+  }
+
+  .main {
+    padding: 12px 10px 22px;
+  }
+
+  .videoImage {
+    height: 165px;
+  }
+
+  .bottomActions {
+    gap: 8px;
+  }
+
+  .outlineButton,
+  .primaryButton {
+    width: 100%;
+  }
+}

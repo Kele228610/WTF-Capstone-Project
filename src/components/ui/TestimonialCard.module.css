@@ -1,0 +1,61 @@
+.card {
+  background: var(--color-white);
+  border: 0.5px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.quoteIcon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.quoteIcon .material-icons {
+  font-size: 24px;
+  color: rgba(176, 198, 248, 0.1);
+}
+
+.quote {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-600);
+  margin: 0 0 20px 0;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.name {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-slate);
+}
+
+.divider {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-100);
+}
+
+.role {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+}

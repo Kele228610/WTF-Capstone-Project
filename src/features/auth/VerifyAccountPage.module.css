@@ -1,0 +1,144 @@
+.overlay {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 14px;
+  background: rgba(15, 23, 42, 0.10);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  position: relative;
+}
+
+.headerArc {
+  position: relative;
+  padding: 28px 18px 10px;
+  text-align: center;
+  background: #f1f5f9;
+}
+
+.headerArc::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -34px;
+  height: 70px;
+  background: #f1f5f9;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.iconWrap {
+  display: grid;
+  place-items: center;
+  margin-top: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.iconSquare {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #124cc9;
+  display: grid;
+  place-items: center;
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+  margin: 10px 0 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #0f172a;
+}
+
+.title {
+  margin: 46px 18px 0;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #0f172a;
+}
+
+.description {
+  margin: 12px 22px 0;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.emailText {
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.primaryBtn {
+  margin: 18px auto 0;
+  width: calc(100% - 88px);
+  max-width: 260px;
+  display: block;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 14px;
+  background: #124cc9;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  filter: brightness(0.96);
+}
+
+.footerText {
+  margin: 14px 18px 22px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: #0f172a;
+}
+
+.resendLink {
+  color: #124cc9;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.resendLink:hover {
+  text-decoration: underline;
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  background: #0f172a;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+  width: calc(100% - 36px);
+  max-width: 360px;
+  text-align: center;
+}

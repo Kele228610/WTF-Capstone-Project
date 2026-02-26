@@ -172,7 +172,7 @@
   border: 0;
   background: transparent;
   color: #1e4da3;
-  font-size: 30px;
+  font-size: 13px;
   font-weight: 700;
   padding: 0;
   cursor: pointer;
@@ -219,7 +219,7 @@
 
 .badgeTitle {
   margin: 10px 0 0;
-  font-size: 24px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -231,7 +231,7 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .courseList {
@@ -271,14 +271,14 @@
 
 .courseTitle {
   margin: 0;
-  font-size: 36px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .courseSubtitle {
   margin: 2px 0 0;
   color: #7788a4;
-  font-size: 28px;
+  font-size: 12px;
 }
 
 .progressRow {
@@ -290,7 +290,7 @@
 
 .progressLabel {
   color: #7788a4;
-  font-size: 24px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -338,7 +338,7 @@
   border: 1px solid #f0a9a9;
   background: #f8fafc;
   color: #ff2f2f;
-  font-size: 34px;
+  font-size: 16px;
   font-weight: 700;
   padding: 14px;
   display: flex;

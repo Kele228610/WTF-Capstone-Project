@@ -82,15 +82,29 @@
 }
 
 .name {
-  margin: 14px 0 0;
+  /* margin: 14px 0 0;
   font-size: 50px;
-  line-height: 1.1;
+  line-height: 1.1; */
+  	position: relative;
+  	font-size: 24px;
+  	line-height: 120%;
+  	font-family: Montserrat;
+  	color: #0f172a;
+  	text-align: center;
 }
 
+
 .role {
-  margin: 2px 0 0;
+  /* margin: 2px 0 0;
   color: #64748b;
-  font-size: 34px;
+  font-size: 34px; */
+  	position: relative;
+  	font-size: 16px;
+  	line-height: 120%;
+  	font-weight: 500;
+  	font-family: Montserrat;
+  	color: #64748b;
+  	text-align: center;
 }
 
 .editProfileButton {
@@ -101,7 +115,7 @@
   padding: 14px 18px;
   background: #2354d1;
   color: #fff;
-  font-size: 36px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
 }

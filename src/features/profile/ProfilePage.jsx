@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ProfilePage.module.css';
 import UserProfile from '../../assets/images/User Profile.png';
 import Icon16 from '../../assets/icons/Icon-16.svg';
+import redlogouticon from '../../assets/icons/redlogouticon.svg';
+
 
 const stats = [
   { value: '2', label: 'SUBJECTS' },
@@ -129,7 +131,7 @@ const ProfilePage = () => {
         </section>
 
         <button type="button" className={styles.logoutButton}>
-          <img className={styles.logoutIcon} src={Icon16} alt="" />
+          <img className={styles.logoutIcon} src={redlogouticon} alt="" />
           Logout
         </button>
 

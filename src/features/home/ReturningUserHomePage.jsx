@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './ReturningUserHomePage.module.css';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
 import Hamburger from '../../assets/icons/Hamburger.png';
@@ -13,6 +14,7 @@ import Notebook from '../../assets/icons/Notebook.png';
 
 const ReturningUserHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleOpenSidebar = () => setIsSidebarOpen(true);
   const handleCloseSidebar = () => setIsSidebarOpen(false);
@@ -84,10 +86,15 @@ const ReturningUserHomePage = () => {
             </div>
           </div>
 
-          <div className={styles.button3}>
+          <button
+            type="button"
+            className={styles.button3}
+            onClick={() => navigate('/lesson/human-anatomy')}
+            aria-label="Resume Human Anatomy lesson"
+          >
             <div className={styles.buttonshadow} />
             <b className={styles['resume-lesson']}>Resume Lesson</b>
-          </div>
+          </button>
         </div>
       </div>
 

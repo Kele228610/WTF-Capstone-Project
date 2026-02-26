@@ -268,6 +268,8 @@
   	left: 0px;
   	border-radius: 16px;
   	background-color: #f59e0b;
+  	border: 0;
+  	cursor: pointer;
   	display: flex;
   	align-items: center;
   	justify-content: center;

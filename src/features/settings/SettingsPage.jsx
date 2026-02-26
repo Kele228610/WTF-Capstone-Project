@@ -18,6 +18,7 @@ import Icon14 from '../../assets/icons/Icon-14.svg';
 import Icon15 from '../../assets/icons/Icon-15.svg';
 import Icon16 from '../../assets/icons/Icon-16.svg';
 
+
 const ChevronRow = ({ iconSrc, iconAlt, title, subtitle, onClick }) => (
   <button type="button" className={styles.rowButton} onClick={onClick}>
     <div className={styles.rowLeft}>
@@ -93,7 +94,7 @@ const SettingsPage = () => {
               iconSrc={Icon1}
               iconAlt="Profile"
               title="Profile"
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate('/settings/profile')}
             />
             <ChevronRow iconSrc={Icon2} iconAlt="Email" title="Email" />
             <ChevronRow iconSrc={Icon3} iconAlt="Password" title="Password" />

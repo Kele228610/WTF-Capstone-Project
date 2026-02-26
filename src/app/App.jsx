@@ -86,6 +86,7 @@ const App = () => {
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings/profile" element={<ProfilePage />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
       </Routes>
     </Router>

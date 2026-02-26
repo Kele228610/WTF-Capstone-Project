@@ -9,7 +9,7 @@ import Greylock from '../../assets/icons/Greylockicon.png';
 import Notesicon from '../../assets/icons/NotesIcon.svg';
 import Lessonplay from '../../assets/icons/Lessonplayicon.png';
 import Question from '../../assets/icons/Questionicon.png';
-import cloudIcon from "../../assets/icons/cloud-icon.png";
+import cloudicon from "../../assets/icons/cloud-icon.png";
 
 const HumanAnatomyLessonPage = () => {
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const HumanAnatomyLessonPage = () => {
                   <div className={styles.completedOk}>Completed</div>
                 </div>
                 {/* <div className={styles.statusDone}>OK</div> */}
-                <img className={styles.cloudIcon} src={cloudIcon} alt="Completed" />
+                <img className={styles.cloudIcon} src={cloudicon} alt="Completed" />
               </div>
 
               <div className={styles.lessonRowActive}>

@@ -25,18 +25,9 @@
 }
 
 .title {
-  /* margin: 0;
-  font-size: 48px;
-  line-height: 1.1; */
-  	width: 83px;
-  	height: 29px;
-  	position: relative;
-  	font-size: 24px;
-  	line-height: 120%;
-  	display: inline-block;
-  	font-family: Montserrat;
-  	color: #0f172a;
-  	text-align: left;
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.1;
 }
 
 
@@ -82,29 +73,17 @@
 }
 
 .name {
-  /* margin: 14px 0 0;
-  font-size: 50px;
-  line-height: 1.1; */
-  	position: relative;
-  	font-size: 24px;
-  	line-height: 120%;
-  	font-family: Montserrat;
-  	color: #0f172a;
-  	text-align: center;
+  margin: 14px 0 0;
+  font-size: 40px;
+  line-height: 1.1;
 }
 
 
 .role {
-  /* margin: 2px 0 0;
+  margin: 2px 0 0;
   color: #64748b;
-  font-size: 34px; */
-  	position: relative;
-  	font-size: 16px;
-  	line-height: 120%;
-  	font-weight: 500;
-  	font-family: Montserrat;
-  	color: #64748b;
-  	text-align: center;
+  font-size: 24px;
+  font-weight: 500;
 }
 
 .editProfileButton {
@@ -221,6 +200,9 @@
   margin: 10px 0 0;
   font-size: 12px;
   font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .badgeTitleMuted {
@@ -296,7 +278,7 @@
 
 .progressPercentDark,
 .progressPercentLight {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -362,53 +344,53 @@
 
 @media (max-width: 768px) {
   .title {
-    font-size: 40px;
-  }
-
-  .name {
     font-size: 28px;
   }
 
-  .role {
-    font-size: 20px;
-  }
-
-  .editProfileButton {
+  .name {
     font-size: 30px;
   }
 
-  .statValue {
-    font-size: 34px;
-  }
-
-  .statLabel {
-    font-size: 16px;
-  }
-
-  .sectionTitle {
-    font-size: 36px;
-  }
-
-  .linkButton {
-    font-size: 22px;
-  }
-
-  .badgeTitle {
+  .role {
     font-size: 18px;
   }
 
+  .editProfileButton {
+    font-size: 18px;
+  }
+
+  .statValue {
+    font-size: 28px;
+  }
+
+  .statLabel {
+    font-size: 10px;
+  }
+
+  .sectionTitle {
+    font-size: 30px;
+  }
+
+  .linkButton {
+    font-size: 16px;
+  }
+
+  .badgeTitle {
+    font-size: 12px;
+  }
+
   .courseTitle {
-    font-size: 32px;
+    font-size: 22px;
   }
 
   .courseSubtitle {
-    font-size: 20px;
+    font-size: 14px;
   }
 
   .progressLabel,
   .progressPercentDark,
   .progressPercentLight {
-    font-size: 18px;
+    font-size: 12px;
   }
 }
 
@@ -456,7 +438,7 @@
   }
 
   .statValue {
-    font-size: 40px;
+    font-size: 32px;
   }
 
   .statLabel {
@@ -469,11 +451,11 @@
   }
 
   .sectionTitle {
-    font-size: 14px;
+    font-size: 34px;
   }
 
   .linkButton {
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .achievementGrid {
@@ -494,7 +476,7 @@
 
   .badgeTitle {
     margin-top: 10px;
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .lockChip {
@@ -514,17 +496,17 @@
   }
 
   .courseTitle {
-    font-size: 13px;
+    font-size: 18px;
   }
 
   .courseSubtitle {
-    font-size: 8px;
+    font-size: 12px;
   }
 
   .progressLabel,
   .progressPercentDark,
   .progressPercentLight {
-    font-size: 6px;
+    font-size: 12px;
   }
 
   .progressTrack {
@@ -532,7 +514,7 @@
   }
 
   .logoutButton {
-    margin-top: 112px;
+    margin-top: 28px;
     font-size: 14px;
     border-radius: 16px;
     padding: 12px;

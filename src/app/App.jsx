@@ -39,7 +39,7 @@ const App = () => {
         {/* ✅ Auth pages WITHOUT header/footer */}
         <Route path="/login" element={<SignInPage />} />
         <Route path="/register" element={<CreateAccount />} />
-        <Route path="/verify-email" element={<VerifyAccountPage />} />
+        <Route path="/verify-account" element={<VerifyAccountPage />} />
         <Route path="/returning-home" element={<ReturningUserHomePage />} />
         <Route path="/new-user-home" element={<NewUserHomePage />} />
         <Route path="/curriculum" element={<CurriculumScreen />} />

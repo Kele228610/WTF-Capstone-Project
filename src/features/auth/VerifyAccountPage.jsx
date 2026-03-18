@@ -1,67 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './VerifyAccountPage.module.css';
-
-const VERIFY_EMAIL_ENDPOINT =
-  'https://wtf-capstone-project-bqrp.vercel.app/api/v1/auth/verify-email';
 
 export default function VerifyAccountPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('Verifying your email...');
+  const location = useLocation();
 
-  useEffect(() => {
-    const token = searchParams.get('token');
+  // Email can be passed from registration flow and shown here.
+  const email = useMemo(() => location.state?.email || '', [location.state]);
 
-    if (!token) {
-      setStatus('error');
-      setMessage('Invalid verification link. Please request a new email verification link.');
-      return undefined;
+  const [resent, setResent] = useState(false);
+
+  const handleGotIt = () => {
+    if (location.state?.startOnboarding) {
+      navigate(location.state?.next || '/register', {
+        state: {
+          startOnboarding: true,
+          prefill: location.state?.prefill || {},
+        },
+      });
+      return;
     }
 
-    const controller = new AbortController();
-    let redirectTimerId;
+    navigate('/new-user-home');
+  };
 
-    async function verifyEmail() {
-      try {
-        const response = await fetch(`${VERIFY_EMAIL_ENDPOINT}?token=${encodeURIComponent(token)}`, {
-          method: 'GET',
-          signal: controller.signal,
-        });
+  const handleResend = (e) => {
+    e.preventDefault();
+    setResent(true);
 
-        const data = await response.json().catch(() => null);
+    // simulate: hide message after a bit
+    setTimeout(() => setResent(false), 2500);
 
-        if (!response.ok) {
-          throw new Error(
-            data?.message || data?.error || 'This verification link is invalid or has expired.'
-          );
-        }
-
-        setStatus('success');
-        setMessage(data?.message || 'Your email has been verified successfully.');
-        redirectTimerId = window.setTimeout(() => {
-          navigate('/login');
-        }, 3000);
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-
-        setStatus('error');
-        setMessage(error.message || 'Unable to verify your email. Please try again.');
-      }
-    }
-
-    verifyEmail();
-
-    return () => {
-      controller.abort();
-      if (redirectTimerId) window.clearTimeout(redirectTimerId);
-    };
-  }, [navigate, searchParams]);
+    // Later: call your backend/API to resend verification email
+    // await api.resendVerification(email);
+  };
 
   return (
-    <main className={styles.page}>
-      <section className={styles.card} aria-live="polite">
+    <div className={styles.overlay}>
+      <div className={styles.card} role="dialog" aria-modal="true" aria-label="Verify your account">
         <div className={styles.headerArc}>
           <div className={styles.iconWrap} aria-hidden="true">
             <div className={styles.iconSquare}>
@@ -71,37 +48,44 @@ export default function VerifyAccountPage() {
           <p className={styles.brand}>EduLearn</p>
         </div>
 
-        <div className={styles.content}>
-          {status === 'loading' ? (
-            <>
-              <h1 className={styles.title}>Verifying...</h1>
-              <span className={styles.spinner} aria-hidden="true" />
-            </>
-          ) : null}
+        <h1 className={styles.title}>Verify Your Account</h1>
 
-          {status === 'success' ? (
+        <p className={styles.description}>
+          We just sent a verification link to your email.
+          <br />
+          Click on it and get started.
+          {email ? (
             <>
-              <h1 className={styles.title}>Email verified</h1>
-              <p className={styles.message}>{message}</p>
-              <p className={styles.helperText}>Redirecting to login in 3 seconds.</p>
+              <br />
+              <span className={styles.emailText}>{email}</span>
             </>
           ) : null}
+        </p>
 
-          {status === 'error' ? (
-            <>
-              <h1 className={styles.title}>Verification failed</h1>
-              <p className={styles.message}>{message}</p>
-            </>
-          ) : null}
-        </div>
-      </section>
-    </main>
+        <button type="button" className={styles.primaryBtn} onClick={handleGotIt}>
+          GOT IT
+        </button>
+
+        <p className={styles.footerText}>
+          Didn&apos;t see the email? Click here to{' '}
+          <a href="#resend" className={styles.resendLink} onClick={handleResend}>
+            resend it
+          </a>
+        </p>
+
+        {resent && (
+          <div className={styles.toast} role="status" aria-live="polite">
+            Verification email resent{email ? ` to ${email}` : ''}.
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
 function GraduationCapIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M12 3L1.8 8.1 12 13.2 22.2 8.1 12 3Z"
         fill="white"

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './EmailVerificationPage.module.css';
 
 const VERIFY_EMAIL_ENDPOINT =
-  'https://wtf-capstone-project-bqrp.vercel.app/api/v1/auth/verify-email';
+  'https://wtf-capstone-project.vercel.app/api/v1/auth/verify-email';
 
 export default function EmailVerificationPage() {
   const [searchParams] = useSearchParams();

@@ -9,6 +9,7 @@ import CreateAccount from '../pages/CreateAccount';
 import CoursesPage from '../features/courses/CoursesPage';
 import CourseDetailPage from '../features/courses/CourseDetailPage';
 import VerifyAccountPage from '../features/auth/VerifyAccountPage';
+import EmailVerificationPage from '../features/auth/EmailVerificationPage';
 import ReturningUserHomePage from '../features/home/ReturningUserHomePage';
 import NewUserHomePage from '../features/home/NewUserHomePage';
 import CurriculumScreen from '../features/curriculum/CurriculumScreen';
@@ -20,7 +21,7 @@ import ProgressTrackerPage from '../features/progress/ProgressTrackerPage';
 import AchievementsPage from '../features/achievements/AchievementsPage';
 import SettingsPage from '../features/settings/SettingsPage';
 import ProfilePage from '../features/profile/ProfilePage';
-// import Dashboard from '../features/home/Dashboard';
+
 
 import '../styles/global.css';
 
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/login" element={<SignInPage />} />
         <Route path="/register" element={<CreateAccount />} />
         <Route path="/verify-account" element={<VerifyAccountPage />} />
+        <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/returning-home" element={<ReturningUserHomePage />} />
         <Route path="/new-user-home" element={<NewUserHomePage />} />
         <Route path="/curriculum" element={<CurriculumScreen />} />

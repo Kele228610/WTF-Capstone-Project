@@ -1,78 +1,125 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import styles from "./VerifyAccountPage.module.css";
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import styles from './EmailVerificationPage.module.css';
 
-export default function VerifyAccountPage() {
+const VERIFY_EMAIL_ENDPOINT =
+  'https://wtf-capstone-project-bqrp.vercel.app/api/v1/auth/verify-email';
+
+export default function EmailVerificationPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get("token");
-
-  const [status, setStatus] = useState("loading");
+  const [status, setStatus] = useState('loading');
+  const [message, setMessage] = useState('Verifying...');
 
   useEffect(() => {
+    const token = searchParams.get('token');
+
     if (!token) {
-      setStatus("error");
-      return;
+      setStatus('error');
+      setMessage('Invalid or expired link.');
+      return undefined;
     }
 
-    const verify = async () => {
+    const controller = new AbortController();
+    let redirectTimerId;
+
+    async function verifyEmail() {
       try {
-        const res = await fetch(
-          `https://wtf-capstone-project-bqrp.vercel.app/api/v1/auth/verify-email?token=${token}`
-        );
+        const response = await fetch(`${VERIFY_EMAIL_ENDPOINT}?token=${encodeURIComponent(token)}`, {
+          method: 'GET',
+          signal: controller.signal,
+        });
 
-        if (!res.ok) throw new Error();
+        const data = await response.json().catch(() => null);
 
-        setStatus("success");
+        if (!response.ok) {
+          throw new Error(
+            data?.message || data?.error || 'Invalid or expired link.'
+          );
+        }
 
-        setTimeout(() => {
-          navigate("/login");
+        setStatus('success');
+        setMessage(data?.message || 'Email verified successfully.');
+        redirectTimerId = window.setTimeout(() => {
+          navigate('/login');
         }, 3000);
-      } catch {
-        setStatus("error");
-      }
-    };
+      } catch (error) {
+        if (error.name === 'AbortError') return;
 
-    verify();
-  }, [token, navigate]);
+        setStatus('error');
+        setMessage(error.message || 'Invalid or expired link.');
+      }
+    }
+
+    verifyEmail();
+
+    return () => {
+      controller.abort();
+      if (redirectTimerId) window.clearTimeout(redirectTimerId);
+    };
+  }, [navigate, searchParams]);
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        
-        {/* Top curved section */}
-        <div className={styles.header}>
-          <div className={styles.iconBox}>
-            🎓
+    <main className={styles.page}>
+      <section className={styles.card} aria-live="polite">
+        <div className={styles.headerArc}>
+          <div className={styles.iconWrap} aria-hidden="true">
+            <div className={styles.iconSquare}>
+              <GraduationCapIcon />
+            </div>
           </div>
-          <h2>EduLearn</h2>
+          <p className={styles.brand}>EduLearn</p>
         </div>
 
-        {/* Content */}
-        <div className={styles.body}>
-          {status === "loading" && (
+        <div className={styles.content}>
+          {status === 'loading' ? (
             <>
-              <p>Verifying...</p>
-              <div className={styles.spinner}></div>
+              <h1 className={styles.title}>Verifying...</h1>
+              <span className={styles.spinner} aria-hidden="true" />
             </>
-          )}
+          ) : null}
 
-          {status === "success" && (
+          {status === 'success' ? (
             <>
-              <p>✅ Verified successfully</p>
-              <p className={styles.sub}>Redirecting...</p>
+              <h1 className={styles.title}>Verified</h1>
+              <p className={styles.message}>{message}</p>
+              <p className={styles.helperText}>Redirecting to login...</p>
             </>
-          )}
+          ) : null}
 
-          {status === "error" && (
+          {status === 'error' ? (
             <>
-              <p>❌ Verification failed</p>
-              <p className={styles.sub}>Invalid or expired link</p>
+              <h1 className={styles.title}>Verification failed</h1>
+              <p className={styles.message}>{message}</p>
             </>
-          )}
+          ) : null}
         </div>
+      </section>
+    </main>
+  );
+}
 
-      </div>
-    </div>
+function GraduationCapIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 3L1.8 8.1 12 13.2 22.2 8.1 12 3Z"
+        fill="white"
+        opacity="0.95"
+      />
+      <path
+        d="M5.2 10.6V15.2C5.2 15.2 7.6 17.6 12 17.6C16.4 17.6 18.8 15.2 18.8 15.2V10.6"
+        stroke="white"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M22.2 8.1V13.6"
+        stroke="white"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

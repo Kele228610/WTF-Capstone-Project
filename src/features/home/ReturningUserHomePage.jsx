@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ReturningUserHomePage.module.css';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
@@ -14,10 +14,24 @@ import Notebook from '../../assets/icons/Notebook.png';
 
 const ReturningUserHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleOpenSidebar = () => setIsSidebarOpen(true);
   const handleCloseSidebar = () => setIsSidebarOpen(false);
+  const handleOpenAssistant = () => setIsAssistantOpen(true);
+  const handleCloseAssistant = () => setIsAssistantOpen(false);
+
+  useEffect(() => {
+    if (!isAssistantOpen) return undefined;
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [isAssistantOpen]);
 
   return (
     <div className={styles['returning-user-homepage']}>
@@ -319,13 +333,80 @@ const ReturningUserHomePage = () => {
         </div>
       </div>
 
-      <div className={styles['floating-ai-assistant-button']}>
+      <button
+        type="button"
+        className={styles['floating-ai-assistant-button']}
+        onClick={handleOpenAssistant}
+        aria-label="Open AI assistant"
+      >
         <div className={styles['floating-ai-assistant-button2']} />
         <div className={styles.container42}>
           <img className={styles.aistarsIcon} src={Aistars} alt="AI Stars" />
           {/* <div className={styles.text11}></div> */}
         </div>
-      </div>
+      </button>
+
+      {isAssistantOpen ? (
+        <div className={styles.assistantOverlay} role="dialog" aria-modal="true" aria-label="EduAI Assistant">
+          <div className={styles.assistantCard}>
+            <div className={styles.assistantHandle} />
+
+            <header className={styles.assistantHeader}>
+              <div className={styles.assistantHeaderLeft}>
+                <div className={styles.assistantAvatar}>
+                  <img className={styles.aistarsIcon} src={Aistars} alt="AI assistant avatar" />
+                </div>
+                <div>
+                  <b className={styles.assistantTitle}>EduAI Assistant</b>
+                  <div className={styles.assistantStatusRow}>
+                    <span className={styles.statusDot} />
+                    <span className={styles.assistantStatus}>Local AI Mode</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className={styles.assistantCloseButton}
+                onClick={handleCloseAssistant}
+                aria-label="Close AI assistant"
+              >
+                ×
+              </button>
+            </header>
+
+            <section className={styles.assistantMessages}>
+              <p className={styles.assistantTime}>Today, 10:45 AM</p>
+              <div className={styles.assistantEmptyState}>
+                <p className={styles.assistantEmptyTitle}>Start a new conversation</p>
+                <p className={styles.assistantEmptyCopy}>
+                  Ask any lesson question and your AI assistant will help right here.
+                </p>
+              </div>
+            </section>
+
+            <footer className={styles.assistantComposer}>
+              <div className={styles.assistantChipRow}>
+                <button type="button" className={styles.assistantChip}>Explain simply</button>
+                <button type="button" className={styles.assistantChip}>Give real-life example</button>
+                <button type="button" className={styles.assistantChip}>Summarize this</button>
+              </div>
+
+              <form className={styles.assistantInputRow} onSubmit={(event) => event.preventDefault()}>
+                <button type="button" className={styles.iconButton} aria-label="Attach file">⌘</button>
+                <input
+                  type="text"
+                  className={styles.assistantInput}
+                  placeholder="Ask EDUlearn AI anything..."
+                  aria-label="Ask AI assistant"
+                />
+                <button type="button" className={styles.iconButton} aria-label="Voice input">◦</button>
+                <button type="submit" className={styles.sendButton} aria-label="Send message">➤</button>
+              </form>
+            </footer>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

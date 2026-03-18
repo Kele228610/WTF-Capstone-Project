@@ -1,25 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InputField from '../inputfield/InputField';
 import styles from './CreateAccountForm.module.css';
 import GoogleSvg from '../../assets/icons/Google.svg';
 import AppleSvg from '../../assets/icons/Apple.svg';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { register } from '../../api/auth';
 
 
 export default function CreateAccountForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const prefill =
+    location.state?.prefill && typeof location.state.prefill === 'object'
+      ? location.state.prefill
+      : {};
+
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    location: ''
+    fullName: prefill.fullName || '',
+    email: prefill.email || '',
+    password: prefill.password || '',
+    location: prefill.location || '',
   });
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(location.state?.startOnboarding || false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [classLevel, setClassLevel] = useState('senior');
-  const [selectedSubjects, setSelectedSubjects] = useState(['mathematics', 'english']);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [dailyGoal, setDailyGoal] = useState('30mins');
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
+
+  useEffect(() => {
+    if (location.state?.startOnboarding) {
+      navigate('/register', { replace: true, state: null });
+    }
+  }, [location.state?.startOnboarding, navigate]);
 
   const subjects = [
     { id: 'mathematics', label: 'Mathematics', icon: 'S' },
@@ -52,14 +67,39 @@ export default function CreateAccountForm() {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError('');
+
     if (!agreedToTerms) {
       alert('Please agree to the Terms & Conditions');
       return;
     }
-    setOnboardingStep(1);
-    setShowOnboarding(true);
+
+    const payload = {
+      fullName: formData.fullName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password,
+      location: formData.location.trim(),
+    };
+
+    try {
+      setLoading(true);
+      await register(payload);
+
+      navigate('/verify-account', {
+        state: {
+          email: payload.email,
+          next: '/register',
+          startOnboarding: true,
+          prefill: payload,
+        },
+      });
+    } catch (err) {
+      setApiError(err?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubjectToggle = (subjectId) => {
@@ -163,9 +203,10 @@ export default function CreateAccountForm() {
           </label>
         </div>
 
-        <button type="submit" className={styles.submitButton}>
-          Create Free Account
+        <button type="submit" className={styles.submitButton} disabled={loading}>
+          {loading ? 'Creating account...' : 'Create Free Account'}
         </button>
+        {apiError ? <p className={styles.apiError}>{apiError}</p> : null}
 
         <div className={styles.divider}>
           <span className={styles.dividerText}>Or continue with</span>

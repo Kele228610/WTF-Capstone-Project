@@ -77,3 +77,9 @@
     font-size: 15px;
   }
 }
+
+.apiError {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #eb1414;
+}

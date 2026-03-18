@@ -1,37 +1,3 @@
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import Header from '../components/layout/Header';
-// import Footer from '../components/layout/Footer';
-// import HomePage from '../features/home/HomePage';
-// import SignInPage from '../features/auth/SignInPage';
-// import CreateAccountPage from '../features/auth/CreateAccountPage';
-// import CoursesPage from '../features/courses/CoursesPage';
-// import CourseDetailPage from '../features/courses/CourseDetailPage';
-// import '../styles/global.css';
-
-// const App = () => {
-//   return (
-//     <Router>
-//       <div className="app">
-//         <Header />
-//         <main>
-//           <Routes>
-//             <Route path="/" element={<HomePage />} />
-//             <Route path="/login" element={<SignInPage />} />
-//             <Route path="/register" element={<CreateAccountPage />} />
-//             <Route path="/courses" element={<CoursesPage />} />
-//             <Route path="/courses/:id" element={<CourseDetailPage />} />
-//           </Routes>
-//         </main>
-//         <Footer />
-//       </div>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
-
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -73,7 +39,7 @@ const App = () => {
         {/* ✅ Auth pages WITHOUT header/footer */}
         <Route path="/login" element={<SignInPage />} />
         <Route path="/register" element={<CreateAccount />} />
-        <Route path="/verify-account" element={<VerifyAccountPage />} />
+        <Route path="/verify-email" element={<VerifyAccountPage />} />
         <Route path="/returning-home" element={<ReturningUserHomePage />} />
         <Route path="/new-user-home" element={<NewUserHomePage />} />
         <Route path="/curriculum" element={<CurriculumScreen />} />

@@ -1,27 +1,27 @@
-.overlay {
+.page {
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 24px 14px;
-  background: rgba(15, 23, 42, 0.10);
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
 }
 
 .card {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
+  min-height: 438px;
   background: #ffffff;
-  border-radius: 28px;
+  border-radius: 30px;
   border: 1px solid #e2e8f0;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
-  position: relative;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
 }
 
 .headerArc {
   position: relative;
-  padding: 28px 18px 10px;
+  padding: 30px 20px 12px;
   text-align: center;
-  background: #f1f5f9;
+  background: #edf1f5;
 }
 
 .headerArc::after {
@@ -29,26 +29,25 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -34px;
-  height: 70px;
-  background: #f1f5f9;
+  bottom: -36px;
+  height: 74px;
+  background: #edf1f5;
   border-bottom-left-radius: 999px;
   border-bottom-right-radius: 999px;
 }
 
 .iconWrap {
-  display: grid;
-  place-items: center;
-  margin-top: 6px;
   position: relative;
   z-index: 1;
+  display: grid;
+  place-items: center;
 }
 
 .iconSquare {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: #124cc9;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: #2156d1;
   display: grid;
   place-items: center;
 }
@@ -56,89 +55,59 @@
 .brand {
   position: relative;
   z-index: 1;
-  margin: 10px 0 0;
+  margin: 14px 0 0;
   font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
   font-weight: 800;
-  font-size: 22px;
   color: #0f172a;
+}
+
+.content {
+  min-height: 258px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  justify-items: center;
+  gap: 24px;
+  padding: 80px 28px 40px;
+  text-align: center;
 }
 
 .title {
-  margin: 46px 18px 0;
-  text-align: center;
+  margin: 0;
   font-family: 'Montserrat', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
+  font-size: 25px;
+  font-weight: 500;
   color: #0f172a;
 }
 
-.description {
-  margin: 12px 22px 0;
-  text-align: center;
+.message {
+  margin: 0;
+  max-width: 290px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
   color: #475569;
 }
 
-.emailText {
-  display: inline-block;
-  margin-top: 6px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.primaryBtn {
-  margin: 18px auto 0;
-  width: calc(100% - 88px);
-  max-width: 260px;
-  display: block;
-  padding: 14px 16px;
-  border: none;
-  border-radius: 14px;
-  background: #124cc9;
-  color: #ffffff;
+.helperText {
+  margin: -10px 0 0;
   font-family: 'Montserrat', sans-serif;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  cursor: pointer;
+  font-size: 13px;
+  color: #64748b;
 }
 
-.primaryBtn:hover {
-  filter: brightness(0.96);
+.spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 5px solid rgba(33, 86, 209, 0.2);
+  border-top-color: #2156d1;
+  animation: verify-spin 0.85s linear infinite;
 }
 
-.footerText {
-  margin: 14px 18px 22px;
-  text-align: center;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  color: #0f172a;
-}
-
-.resendLink {
-  color: #124cc9;
-  text-decoration: none;
-  font-weight: 800;
-}
-
-.resendLink:hover {
-  text-decoration: underline;
-}
-
-.toast {
-  position: absolute;
-  left: 50%;
-  bottom: 12px;
-  transform: translateX(-50%);
-  background: #0f172a;
-  color: #ffffff;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
-  width: calc(100% - 36px);
-  max-width: 360px;
-  text-align: center;
+@keyframes verify-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

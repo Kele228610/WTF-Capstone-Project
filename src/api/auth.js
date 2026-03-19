@@ -12,9 +12,11 @@ export function register(payload) {
   });
 }
 
-// 2) Verify email (token is sent as query param)
+// 2) Verify email
 export async function verifyEmail(token) {
-  const data = await apiFetch(`${AUTH}/verify-email?token=${encodeURIComponent(token)}`, {
+  const data = await apiFetch(`${AUTH}/verify-email`, {
+    method: "POST",
+    body: { token },
     auth: false
   });
   const accessToken = extractAccessToken(data);

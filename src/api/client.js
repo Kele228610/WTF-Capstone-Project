@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const AUTH_REFRESH_PATH = "/api/v1/auth/refresh-token";
 const NO_REFRESH_RETRY_PATHS = ["/api/v1/auth/login", "/api/v1/auth/refresh-token"];
 const SESSION_HINT_KEY = "edulearn_session_expected";
-const PUBLIC_AUTH_PATHS = ["/login", "/register", "/verify-account"];
+const PUBLIC_AUTH_PATHS = ["/login", "/register", "/verify-account", "/verify-email"];
 let accessTokenMemory = null;
 
 

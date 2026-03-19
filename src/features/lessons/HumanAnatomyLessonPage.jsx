@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './HumanAnatomyLessonPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
@@ -100,13 +100,24 @@ const HumanAnatomyLessonPage = () => {
   const [moduleErrors, setModuleErrors] = useState({});
   const [pageError, setPageError] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
+  const lastLessonLoadKeyRef = useRef('');
+  const loadedSubmoduleModuleIdsRef = useRef(new Set());
 
   useEffect(() => {
     let cancelled = false;
+    const lessonIdHint = location.state?.lessonId || storedContext?.lessonId || 'session';
+    const moduleIdHint = location.state?.moduleId || storedContext?.moduleId || 'default';
+    const loadKey = `${lessonIdHint}:${moduleIdHint}`;
+
+    if (lastLessonLoadKeyRef.current === loadKey && lesson && modules.length > 0) {
+      return undefined;
+    }
 
     async function loadLessonPage() {
       try {
-        setPageLoading(true);
+        if (!lesson) {
+          setPageLoading(true);
+        }
         setPageError('');
 
         const initialSession = location.state?.session || storedContext?.session;
@@ -135,6 +146,10 @@ const HumanAnatomyLessonPage = () => {
         setModules(modulesPayload);
         setProfile(profilePayload);
         setOpenModuleId(defaultModuleId);
+        setSubmodulesByModuleId({});
+        setModuleErrors({});
+        loadedSubmoduleModuleIdsRef.current = new Set();
+        lastLessonLoadKeyRef.current = loadKey;
 
         saveLessonContext({
           session: sessionPayload,
@@ -155,10 +170,11 @@ const HumanAnatomyLessonPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [location.state, storedContext?.lessonId, storedContext?.moduleId, storedContext?.session]);
+  }, [lesson, location.state?.lessonId, location.state?.moduleId, location.state?.session, modules.length, storedContext?.lessonId, storedContext?.moduleId, storedContext?.session]);
 
   useEffect(() => {
-    if (!openModuleId || modules.length === 0 || submodulesByModuleId[openModuleId]) return;
+    if (!openModuleId || modules.length === 0) return;
+    if (loadedSubmoduleModuleIdsRef.current.has(openModuleId)) return;
 
     const module = modules.find((entry) => getEntityId(entry) === openModuleId);
     if (!module) return;
@@ -199,6 +215,7 @@ const HumanAnatomyLessonPage = () => {
           )
         );
         setSubmodulesByModuleId((prev) => ({ ...prev, [openModuleId]: normalizedSubmodules }));
+        loadedSubmoduleModuleIdsRef.current.add(openModuleId);
       } catch (error) {
         if (cancelled) return;
         setModuleErrors((prev) => ({
@@ -215,7 +232,7 @@ const HumanAnatomyLessonPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [modules, openModuleId, submodulesByModuleId]);
+  }, [modules, openModuleId]);
 
   const lessonTitle = lesson?.title || 'Human Anatomy';
   const lessonSubject = lesson?.courseName || lesson?.subject || 'SCIENCE';

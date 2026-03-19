@@ -131,6 +131,15 @@
   z-index: 1;
 }
 
+.heroError {
+  margin: 12px 0 0;
+  position: relative;
+  z-index: 1;
+  color: #b91c1c;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
 .goalCard {
   border: 1px solid #9fb9ee;
   border-radius: 22px;

@@ -33,6 +33,7 @@ const NewUserHomePage = () => {
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState('');
   const [startingLesson, setStartingLesson] = useState(false);
+  const [lessonStartError, setLessonStartError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +62,7 @@ const NewUserHomePage = () => {
   const handleStartLesson = async () => {
     try {
       setStartingLesson(true);
+      setLessonStartError('');
       const session = await startLessonSession();
       const payload = session?.data || session;
       const lessonId =
@@ -82,7 +84,7 @@ const NewUserHomePage = () => {
         },
       });
     } catch (error) {
-      window.alert(error?.message || 'Unable to start lesson.');
+      setLessonStartError(error?.message || 'Unable to start lesson.');
     } finally {
       setStartingLesson(false);
     }
@@ -119,6 +121,7 @@ const NewUserHomePage = () => {
         <button type="button" className={styles.primaryCta} onClick={handleStartLesson} disabled={startingLesson}>
           {startingLesson ? 'Starting...' : 'Start Lesson'} <span aria-hidden="true">{'>'}</span>
         </button>
+        {lessonStartError ? <p className={styles.heroError}>{lessonStartError}</p> : null}
       </section>
 
       <section className={styles.goalCard}>

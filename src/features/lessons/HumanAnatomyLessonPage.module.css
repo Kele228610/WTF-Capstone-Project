@@ -225,6 +225,7 @@
   border-bottom: 0;
   text-align: left;
   cursor: pointer;
+  transition: background-color 0.18s ease;
 }
 
 .lessonRowActive {
@@ -239,6 +240,12 @@
   border-bottom: 0;
   text-align: left;
   cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.lessonRow:hover,
+.lessonRowActive:hover {
+  background: #B0C6F8;
 }
 
 .notesIcon,

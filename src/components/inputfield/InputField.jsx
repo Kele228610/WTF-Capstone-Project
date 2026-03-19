@@ -1,42 +1,8 @@
-// import React from 'react';
-// import styles from './InputField.module.css';
 
-// const InputField = ({
-//   label,
-//   type = 'text',
-//   name,
-//   id,
-//   placeholder,
-//   value,
-//   onChange,
-//   required = false,
-// }) => {
-//   return (
-//     <div className={styles.inputField}>
-//       {/* Label */}
-//       <label htmlFor={id} className={styles.label}>
-//         {label}
-//       </label>
-
-//       {/* Input */}
-//       <input
-//         type={type}
-//         name={name}
-//         id={id}
-//         placeholder={placeholder}
-//         value={value}
-//         onChange={onChange}
-//         required={required}
-//         className={styles.input}
-//       />
-//     </div>
-//   );
-// };
-
-// export default InputField;
-
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './InputField.module.css';
+import hideIcon from '../../assets/icons/Hide.svg';
+import showIcon from '../../assets/icons/Show.png';
 
 const InputField = ({
   label,
@@ -57,13 +23,31 @@ const InputField = ({
   rightIconAlt = '',
   onRightIconClick,
   rightIconAriaLabel = 'Toggle',
+  showPasswordToggle = false,
 
   // Error / helper text
   error,
   helperText,
 }) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const hasLeftIcon = Boolean(leftIconSrc);
-  const hasRightIcon = Boolean(rightIconSrc);
+  const shouldShowPasswordToggle = showPasswordToggle && type === 'password';
+  const resolvedType = shouldShowPasswordToggle
+    ? (isPasswordVisible ? 'text' : 'password')
+    : type;
+  const resolvedRightIconSrc = shouldShowPasswordToggle
+    ? (isPasswordVisible ? hideIcon : showIcon)
+    : rightIconSrc;
+  const resolvedRightIconAlt = shouldShowPasswordToggle
+    ? (isPasswordVisible ? 'Hide password' : 'Show password')
+    : rightIconAlt;
+  const resolvedRightIconAriaLabel = shouldShowPasswordToggle
+    ? (isPasswordVisible ? 'Hide password' : 'Show password')
+    : rightIconAriaLabel;
+  const resolvedRightIconClick = shouldShowPasswordToggle
+    ? (() => setIsPasswordVisible((prev) => !prev))
+    : onRightIconClick;
+  const hasRightIcon = Boolean(resolvedRightIconSrc);
 
   return (
     <div className={styles.inputField}>
@@ -82,7 +66,7 @@ const InputField = ({
         )}
 
         <input
-          type={type}
+          type={resolvedType}
           name={name}
           id={id}
           placeholder={placeholder}
@@ -103,10 +87,10 @@ const InputField = ({
           <button
             type="button"
             className={styles.rightIconBtn}
-            onClick={onRightIconClick}
-            aria-label={rightIconAriaLabel}
+            onClick={resolvedRightIconClick}
+            aria-label={resolvedRightIconAriaLabel}
           >
-            <img className={styles.rightIcon} src={rightIconSrc} alt={rightIconAlt} />
+            <img className={styles.rightIcon} src={resolvedRightIconSrc} alt={resolvedRightIconAlt} />
           </button>
         )}
       </div>

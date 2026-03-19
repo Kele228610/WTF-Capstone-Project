@@ -5,6 +5,7 @@ import GoogleSvg from '../../assets/icons/Google.svg';
 import AppleSvg from '../../assets/icons/Apple.svg';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { register } from '../../api/auth';
+import { assignCourses } from '../../api/courses';
 import { updateProfile } from '../../api/profile';
 import {
   clearPendingOnboarding,
@@ -132,10 +133,16 @@ export default function CreateAccountForm() {
       setOnboardingSaving(true);
       setOnboardingError('');
 
+      const courseNames = selectedSubjects.map((subjectId) => subjectId.toUpperCase());
+      const normalizedClassLevel = classLevel === 'senior' ? 'SENIOR' : 'JUNIOR';
+
+      if (courseNames.length > 0) {
+        await assignCourses(courseNames);
+      }
+
       await updateProfile({
-        classLevel,
+        classLevel: normalizedClassLevel,
         dailyGoal,
-        subjects: selectedSubjects,
       });
 
       clearPendingOnboarding();

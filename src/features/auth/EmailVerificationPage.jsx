@@ -1,67 +1,54 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { verifyEmail } from '../../api/auth';
 import styles from './EmailVerificationPage.module.css';
-
-const VERIFY_EMAIL_ENDPOINT =
-  'https://wtf-capstone-project.vercel.app/api/v1/auth/verify-email';
 
 export default function EmailVerificationPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('Verifying...');
+  const token = searchParams.get('token');
+  const [status, setStatus] = useState(token ? 'loading' : 'error');
+  const [message, setMessage] = useState(token ? 'Verifying...' : 'Invalid or expired verification link.');
 
   useEffect(() => {
-    const token = searchParams.get('token');
-
     if (!token) {
-      setStatus('error');
-      setMessage('Invalid or expired link.');
       return undefined;
     }
 
-    const controller = new AbortController();
     let redirectTimerId;
+    let cancelled = false;
 
-    async function verifyEmail() {
+    async function runVerification() {
       try {
-        const response = await fetch(`${VERIFY_EMAIL_ENDPOINT}?token=${encodeURIComponent(token)}`, {
-          method: 'GET',
-          signal: controller.signal,
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message || data?.error || 'Invalid or expired link.'
-          );
-        }
+        const data = await verifyEmail(token);
+        if (cancelled) return;
 
         setStatus('success');
-        setMessage(data?.message || 'Email verified successfully.');
+        setMessage(data?.message || 'Your email has been verified successfully.');
+
         redirectTimerId = window.setTimeout(() => {
           navigate('/login');
         }, 3000);
       } catch (error) {
-        if (error.name === 'AbortError') return;
+        if (cancelled) return;
+
 
         setStatus('error');
-        setMessage(error.message || 'Invalid or expired link.');
+        setMessage(error?.message || 'Invalid or expired verification link.');
       }
     }
 
-    verifyEmail();
+    runVerification();
 
     return () => {
-      controller.abort();
+      cancelled = true;
       if (redirectTimerId) window.clearTimeout(redirectTimerId);
     };
-  }, [navigate, searchParams]);
+  }, [navigate, token]);
 
   return (
     <main className={styles.page}>
-      <section className={styles.card} aria-live="polite">
+      <section className={styles.card} role="dialog" aria-modal="true" aria-live="polite">
         <div className={styles.headerArc}>
           <div className={styles.iconWrap} aria-hidden="true">
             <div className={styles.iconSquare}>

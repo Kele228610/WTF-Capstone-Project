@@ -1,5 +1,5 @@
 // src/api/auth.js
-import { apiFetch, setTokens, clearTokens, extractAccessToken, refreshAccessToken } from "./client";
+import { apiFetch, getAccessToken, setTokens, clearTokens, extractAccessToken } from "./client";
 
 const AUTH = "/api/v1/auth";
 
@@ -25,8 +25,7 @@ export async function verifyEmail(token) {
 }
 
 // 3) Resend verification email
-export function resendVerification(payload) {
-  // payload might be { email } depending on backend
+export async function resendVerification(payload) {
   return apiFetch(`${AUTH}/resend-verification`, {
     method: "POST",
     body: payload,
@@ -49,13 +48,16 @@ export async function login(payload) {
 }
 
 // 5) Refresh token
-export async function refreshToken() {
-  return refreshAccessToken();
+export async function refreshToken(token = getAccessToken()) {
+  return apiFetch(`${AUTH}/refresh-token`, {
+    method: "POST",
+    auth: false,
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined
+  });
 }
 
 // 6) Forgot password
-export function forgotPassword(payload) {
-  // payload usually { email }
+export async function forgotPassword(payload) {
   return apiFetch(`${AUTH}/forgot-password`, {
     method: "POST",
     body: payload,
@@ -64,9 +66,7 @@ export function forgotPassword(payload) {
 }
 
 // 7) Reset password
-export function resetPassword(payload) {
-  // payload varies by backend:
-  // could be { token, newPassword } or { token, password }
+export async function resetPassword(payload) {
   return apiFetch(`${AUTH}/reset-password`, {
     method: "POST",
     body: payload,
@@ -75,19 +75,28 @@ export function resetPassword(payload) {
 }
 
 // 8) Password resend verification (if your flow uses it)
-export function passwordResendVerification(payload) {
-  return apiFetch(`${AUTH}/password-resend-verification`, {
+export async function resendPasswordVerification(payload) {
+  await apiFetch(`${AUTH}/password-resend-verification`, {
     method: "POST",
     body: payload,
     auth: false
   });
+  return true;
 }
 
 // 9) Logout
-export async function logout() {
+export async function logoutUser(token = getAccessToken()) {
   try {
-    await apiFetch(`${AUTH}/logout`, { method: "POST" });
+    await apiFetch(`${AUTH}/logout`, {
+      method: "POST",
+      auth: false,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined
+    });
   } finally {
+    localStorage.removeItem("token");
     clearTokens();
   }
 }
+
+export const passwordResendVerification = resendPasswordVerification;
+export const logout = logoutUser;

@@ -14,6 +14,8 @@ export function register(payload) {
 
 // 2) Verify email
 export async function verifyEmail(token) {
+  console.log("verify", token);
+  
   const data = await apiFetch(`${AUTH}/verify-email`, {
     method: "POST",
     body: { token },

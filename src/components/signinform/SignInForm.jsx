@@ -153,7 +153,7 @@ const SignInForm = () => {
     try {
       setLoading(true);
 
-      // ✅ CALL BACKEND
+      // CALL BACKEND
       await login({
         email: formData.email.trim().toLowerCase(),
         password: formData.password
@@ -210,7 +210,7 @@ const SignInForm = () => {
         </a>
       </div>
 
-      {/* ✅ Show API error message */}
+      {/* Show API error message */}
       {apiError && <p className={styles.apiError}>{apiError}</p>}
 
       <button type="submit" className={styles.submitButton} disabled={loading}>

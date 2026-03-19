@@ -7,6 +7,7 @@ export default function EmailVerificationPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
+  
   const [status, setStatus] = useState(token ? 'loading' : 'error');
   const [message, setMessage] = useState(token ? 'Verifying...' : 'Invalid or expired verification link.');
 
@@ -20,6 +21,7 @@ export default function EmailVerificationPage() {
 
     async function runVerification() {
       try {
+        
         const data = await verifyEmail(token);
         if (cancelled) return;
 
@@ -70,7 +72,7 @@ export default function EmailVerificationPage() {
             <>
               <h1 className={styles.title}>Verified</h1>
               <p className={styles.message}>{message}</p>
-              <p className={styles.helperText}>Redirecting to login...</p>
+              {/* <p className={styles.helperText}>Redirecting to login...</p> */}
             </>
           ) : null}
 

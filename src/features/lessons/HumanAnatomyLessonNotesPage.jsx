@@ -5,6 +5,7 @@ import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
 import NotesIcon from '../../assets/icons/NotesIcon.svg';
 import KnowledgeIcon from '../../assets/icons/KnowledgeIcon.svg';
+import Downloadicon from '../../assets/icons/Downloadicon.png'; 
 
 const NOTE_LINES = [
   'In this lesson, we learn that anatomical terminology provides standardized words used by healthcare professionals to describe the location, position, and relationship of body structures clearly and accurately. All descriptions are based on the anatomical position, where the body stands upright, faces forward, arms are at the sides, palms face forward, and feet are slightly apart. Common directional terms help describe where one body part is relative to another:',
@@ -24,7 +25,7 @@ const HumanAnatomyLessonNotesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState('Medial');
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
 
   const lessonTitle = location.state?.lessonTitle || 'Introduction to Anatomical Terms';
 
@@ -76,7 +77,9 @@ const HumanAnatomyLessonNotesPage = () => {
           </div>
 
           <button type="button" className={styles.downloadLink}>
-            <span className={styles.downloadGlyph}>+</span>
+            <span className={styles.downloadIcon}>
+              <img src={Downloadicon} alt="Download icon" />
+            </span>
             Download
           </button>
         </section>

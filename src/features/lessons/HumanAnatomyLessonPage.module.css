@@ -219,6 +219,12 @@
   padding: 16px;
   background: #e4e9f2;
   border-top: 1px solid #d7deea;
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  text-align: left;
+  cursor: pointer;
 }
 
 .lessonRowActive {
@@ -228,6 +234,12 @@
   padding: 16px;
   /* background: #b8c8ee; */
   background: lightblue;
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  text-align: left;
+  cursor: pointer;
 }
 
 .notesIcon,

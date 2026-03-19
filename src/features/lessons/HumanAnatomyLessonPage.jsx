@@ -37,6 +37,7 @@ const HumanAnatomyLessonPage = () => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openModuleId, setOpenModuleId] = useState(null);
+  const [selectedLessonItem, setSelectedLessonItem] = useState(null);
   const [lesson, setLesson] = useState(null);
   const [modules, setModules] = useState([]);
   const [profile, setProfile] = useState(null);
@@ -179,7 +180,11 @@ const HumanAnatomyLessonPage = () => {
                 </button>
               </div>
 
-              <div className={styles.lessonRow}>
+              <button
+                type="button"
+                className={selectedLessonItem === `${moduleId}-notes` ? styles.lessonRowActive : styles.lessonRow}
+                onClick={() => setSelectedLessonItem(`${moduleId}-notes`)}
+              >
                 <img className={styles.notesIcon} src={Notesicon} alt="Notes icon" />
                 <div className={styles.lessonBody}>
                   <b className={styles.lessonName}>{lessonTitle}</b>
@@ -187,27 +192,45 @@ const HumanAnatomyLessonPage = () => {
                   <div className={styles.completedOk}>Current lesson</div>
                 </div>
                 <img className={styles.cloudIcon} src={cloudicon} alt="Current module" />
-              </div>
+              </button>
 
-              <div className={styles.lessonRowActive}>
+              <button
+                type="button"
+                className={selectedLessonItem === `${moduleId}-active` ? styles.lessonRowActive : styles.lessonRow}
+                onClick={() => setSelectedLessonItem(`${moduleId}-active`)}
+              >
                 <img className={styles.lessonIconPlay} src={Lessonplay} alt="Play icon" />
                 <div className={styles.lessonBody}>
-                  <b className={styles.lessonNameActive}>{moduleTitle}</b>
+                  <b className={selectedLessonItem === `${moduleId}-active` ? styles.lessonNameActive : styles.lessonName}>
+                    {moduleTitle}
+                  </b>
                   <div className={styles.lessonMeta}>Active module</div>
                   <div className={styles.downloadBad}>Ready to continue</div>
                 </div>
-                <div className={styles.statusCircle} />
-              </div>
+                {selectedLessonItem === `${moduleId}-active` ? <div className={styles.statusCircle} /> : null}
+              </button>
 
-              <div className={styles.lessonRow}>
+              <button
+                type="button"
+                className={selectedLessonItem === `${moduleId}-assessment` ? styles.lessonRowActive : styles.lessonRow}
+                onClick={() => setSelectedLessonItem(`${moduleId}-assessment`)}
+              >
                 <img className={styles.lessonIconLock} src={Question} alt="Question icon" />
                 <div className={styles.lessonBody}>
-                  <b className={styles.lessonName}>Module Assessment</b>
+                  <b
+                    className={
+                      selectedLessonItem === `${moduleId}-assessment`
+                        ? styles.lessonNameActive
+                        : styles.lessonName
+                    }
+                  >
+                    Module Assessment
+                  </b>
                   <div className={styles.lessonMeta}>Available after completion</div>
                   <div className={styles.lessonMeta}>Available offline</div>
                 </div>
                 <img className={styles.lockIcon} src={Greylock} alt="Locked" />
-              </div>
+              </button>
             </section>
           );
         })}

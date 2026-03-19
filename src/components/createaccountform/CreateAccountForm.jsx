@@ -5,6 +5,12 @@ import GoogleSvg from '../../assets/icons/Google.svg';
 import AppleSvg from '../../assets/icons/Apple.svg';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { register } from '../../api/auth';
+import { updateProfile } from '../../api/profile';
+import {
+  clearPendingOnboarding,
+  readPendingOnboarding,
+  savePendingOnboarding,
+} from '../../features/auth/onboardingStorage';
 
 
 export default function CreateAccountForm() {
@@ -13,7 +19,7 @@ export default function CreateAccountForm() {
   const prefill =
     location.state?.prefill && typeof location.state.prefill === 'object'
       ? location.state.prefill
-      : {};
+      : readPendingOnboarding()?.prefill || {};
 
   const [formData, setFormData] = useState({
     fullName: prefill.fullName || '',
@@ -29,6 +35,8 @@ export default function CreateAccountForm() {
   const [dailyGoal, setDailyGoal] = useState('30mins');
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [onboardingSaving, setOnboardingSaving] = useState(false);
+  const [onboardingError, setOnboardingError] = useState('');
 
   useEffect(() => {
     if (location.state?.startOnboarding) {
@@ -86,6 +94,9 @@ export default function CreateAccountForm() {
     try {
       setLoading(true);
       await register(payload);
+      savePendingOnboarding({
+        prefill: payload,
+      });
 
       navigate('/verify-account', {
         state: {
@@ -114,6 +125,28 @@ export default function CreateAccountForm() {
   const handleSocialLogin = (provider) => {
     console.log(`Login with ${provider}`);
     // Handle social login
+  };
+
+  const handleFinishOnboarding = async () => {
+    try {
+      setOnboardingSaving(true);
+      setOnboardingError('');
+
+      await updateProfile({
+        classLevel,
+        dailyGoal,
+        subjects: selectedSubjects,
+      });
+
+      clearPendingOnboarding();
+      setShowOnboarding(false);
+      setOnboardingStep(1);
+      navigate('/new-user-home');
+    } catch (err) {
+      setOnboardingError(err?.message || 'Failed to save onboarding. Please try again.');
+    } finally {
+      setOnboardingSaving(false);
+    }
   };
 
   return (
@@ -392,16 +425,14 @@ export default function CreateAccountForm() {
               </div>
 
               <div className={styles.onboardingFooter}>
+                {onboardingError ? <p className={styles.onboardingError}>{onboardingError}</p> : null}
                 <button
                   type="button"
                   className={styles.continueButton}
-                  onClick={() => {
-                    setShowOnboarding(false);
-                    setOnboardingStep(1);
-                    navigate('/new-user-home');
-                  }}
+                  onClick={handleFinishOnboarding}
+                  disabled={onboardingSaving}
                 >
-                  Finish & Setup &rarr;
+                  {onboardingSaving ? 'Saving...' : 'Finish & Setup →'}
                 </button>
               </div>
             </>

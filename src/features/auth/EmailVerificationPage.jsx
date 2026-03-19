@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { verifyEmail } from '../../api/auth';
 import styles from './EmailVerificationPage.module.css';
+import { clearPendingOnboarding, readPendingOnboarding } from './onboardingStorage';
 
 export default function EmailVerificationPage() {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,6 @@ export default function EmailVerificationPage() {
 
     async function runVerification() {
       try {
-        
         const data = await verifyEmail(token);
         if (cancelled) return;
 
@@ -29,7 +29,20 @@ export default function EmailVerificationPage() {
         setMessage(data?.message || 'Your email has been verified successfully.');
 
         redirectTimerId = window.setTimeout(() => {
-          navigate('/login');
+          const pendingOnboarding = readPendingOnboarding();
+
+          if (pendingOnboarding?.prefill) {
+            navigate('/register', {
+              state: {
+                startOnboarding: true,
+                prefill: pendingOnboarding.prefill,
+              },
+            });
+            return;
+          }
+
+          clearPendingOnboarding();
+          navigate('/new-user-home');
         }, 3000);
       } catch (error) {
         if (cancelled) return;
@@ -72,7 +85,7 @@ export default function EmailVerificationPage() {
             <>
               <h1 className={styles.title}>Verified</h1>
               <p className={styles.message}>{message}</p>
-              {/* <p className={styles.helperText}>Redirecting to login...</p> */}
+              <p className={styles.helperText}>Preparing your onboarding...</p>
             </>
           ) : null}
 

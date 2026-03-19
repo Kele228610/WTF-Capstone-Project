@@ -375,6 +375,15 @@
   padding: 20px 18px 22px;
 }
 
+.onboardingError {
+  margin: 0 0 12px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
 .continueButton {
   width: 100%;
   border: 0;

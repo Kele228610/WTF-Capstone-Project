@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './NewUserHomePage.module.css';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
@@ -7,6 +7,8 @@ import Notificationbell from '../../assets/icons/Notificationbell.png';
 import Aistars from '../../assets/icons/Aistars.png';
 import Bluequestion from '../../assets/icons/Bluequestion.png';
 import Notebook from '../../assets/icons/Notebook.png';
+import { getProfile } from '../../api/profile';
+import { startLessonSession } from '../../api/lessons';
 
 const lessonCards = [
   {
@@ -28,6 +30,63 @@ const lessonCards = [
 const NewUserHomePage = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [profileError, setProfileError] = useState('');
+  const [startingLesson, setStartingLesson] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        setProfile(data?.data || data);
+      } catch (error) {
+        if (cancelled) return;
+        setProfileError(error?.message || 'Unable to load profile.');
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const lessonProgress = profile?.lessonProgress ?? 0;
+  const dailyGoal = profile?.dailyGoal || '30mins';
+
+  const handleStartLesson = async () => {
+    try {
+      setStartingLesson(true);
+      const session = await startLessonSession();
+      const payload = session?.data || session;
+      const lessonId =
+        payload?.lessonId ||
+        payload?.lesson?.id ||
+        payload?.lesson?._id ||
+        payload?.lesson?._id;
+      const moduleId =
+        payload?.moduleId ||
+        payload?.module?.id ||
+        payload?.module?._id ||
+        payload?.currentModuleId;
+
+      navigate('/lesson/human-anatomy', {
+        state: {
+          lessonId,
+          moduleId,
+          session: payload,
+        },
+      });
+    } catch (error) {
+      window.alert(error?.message || 'Unable to start lesson.');
+    } finally {
+      setStartingLesson(false);
+    }
+  };
 
   return (
     <main className={styles.page}>
@@ -57,19 +116,19 @@ const NewUserHomePage = () => {
         <p className={styles.heroSubtitle}>
           Let&apos;s start with Human Anatomy and build your foundation.
         </p>
-        <button type="button" className={styles.primaryCta} onClick={() => navigate('/lesson/human-anatomy')}>
-          Start Lesson <span aria-hidden="true">{'>'}</span>
+        <button type="button" className={styles.primaryCta} onClick={handleStartLesson} disabled={startingLesson}>
+          {startingLesson ? 'Starting...' : 'Start Lesson'} <span aria-hidden="true">{'>'}</span>
         </button>
       </section>
 
       <section className={styles.goalCard}>
         <div>
           <h3 className={styles.goalTitle}>Daily Goal</h3>
-          <div className={styles.goalValue}>0 <span>/ 30m</span></div>
-          <p className={styles.goalHint}>Keep your streak alive!</p>
+          <div className={styles.goalValue}>{lessonProgress} <span>/ {dailyGoal}</span></div>
+          <p className={styles.goalHint}>{profileError || 'Keep your streak alive!'}</p>
         </div>
         <div className={styles.goalRing}>
-          <span>0%</span>
+          <span>{lessonProgress}%</span>
         </div>
       </section>
 

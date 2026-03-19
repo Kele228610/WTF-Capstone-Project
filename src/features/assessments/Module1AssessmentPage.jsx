@@ -116,6 +116,12 @@ const Module1AssessmentPage = () => {
     setShowResultPopup(true);
   };
 
+  const handleRetakeAssessment = () => {
+    setAnswers({});
+    setScore(0);
+    setShowResultPopup(false);
+  };
+
   const percentage = questions.length ? Math.round((score / questions.length) * 100) : 0;
   const isPassed = questions.length > 0 ? score / questions.length >= PASS_MARK : false;
 
@@ -267,7 +273,7 @@ const Module1AssessmentPage = () => {
               <button
                 type="button"
                 className={styles.popupPrimaryButton}
-                onClick={isPassed ? () => navigate('/curriculum') : () => setShowResultPopup(false)}
+                onClick={isPassed ? () => navigate('/curriculum') : handleRetakeAssessment}
               >
                 {isPassed ? 'Next Lesson' : 'Retake Assessment'}
               </button>

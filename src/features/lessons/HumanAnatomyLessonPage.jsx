@@ -10,8 +10,15 @@ import Notesicon from '../../assets/icons/NotesIcon.svg';
 import Lessonplay from '../../assets/icons/Lessonplayicon.png';
 import Question from '../../assets/icons/Questionicon.png';
 import cloudicon from '../../assets/icons/cloud-icon.png';
-import { getLessonById, getModulesByLessonId, startLessonSession } from '../../api/lessons';
+import {
+  getLessonById,
+  getModuleById,
+  getModulesByLessonId,
+  getSubmodulesByModuleId,
+  startLessonSession,
+} from '../../api/lessons';
 import { getProfile } from '../../api/profile';
+import { readLessonContext, saveLessonContext } from './lessonContext';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -32,15 +39,65 @@ function extractModules(data) {
   return [];
 }
 
+function extractSubmodules(data) {
+  const payload = extractPayload(data);
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.submodules)) return payload.submodules;
+  return [];
+}
+
+function getEntityId(item, fallback) {
+  return item?.id || item?._id || item?.submoduleId || item?.moduleId || fallback;
+}
+
+function normalizeModuleTitle(module, fallback) {
+  return module?.title || module?.moduleTitle || module?.name || fallback;
+}
+
+function normalizeSubmodule(item, index, moduleTitle) {
+  const rawTitle = item?.title || item?.submoduleTitle || item?.contentTitle || item?.name || `Lesson ${index + 1}`;
+  const loweredTitle = String(rawTitle).trim().toLowerCase();
+  const normalizedModuleTitle = String(moduleTitle || '').trim().toLowerCase();
+  const contentType = String(item?.contentType || item?.type || item?.mediaType || item?.format || '').toLowerCase();
+  const hasVideo = Boolean(item?.contentUrl) || contentType.includes('video');
+  const isAssessment =
+    contentType.includes('assessment') ||
+    contentType.includes('quiz') ||
+    loweredTitle.includes('assessment');
+
+  let title = rawTitle;
+  if (
+    normalizedModuleTitle === 'foundations of anatomy' &&
+    index === 1 &&
+    loweredTitle === 'human anatomy'
+  ) {
+    title = 'Body Planes and Cavities';
+  }
+
+  return {
+    ...item,
+    id: getEntityId(item, `submodule-${index}`),
+    title,
+    hasVideo,
+    isAssessment,
+  };
+}
+
 const HumanAnatomyLessonPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const storedContext = readLessonContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openModuleId, setOpenModuleId] = useState(null);
-  const [selectedLessonItem, setSelectedLessonItem] = useState(null);
+  const [selectedLessonItem, setSelectedLessonItem] = useState(
+    location.state?.submoduleId || storedContext?.submoduleId || null
+  );
   const [lesson, setLesson] = useState(null);
   const [modules, setModules] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [submodulesByModuleId, setSubmodulesByModuleId] = useState({});
+  const [loadingModuleId, setLoadingModuleId] = useState(null);
+  const [moduleErrors, setModuleErrors] = useState({});
   const [pageError, setPageError] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -52,10 +109,10 @@ const HumanAnatomyLessonPage = () => {
         setPageLoading(true);
         setPageError('');
 
-        const initialSession = location.state?.session;
+        const initialSession = location.state?.session || storedContext?.session;
         const sessionPayload = initialSession || extractPayload(await startLessonSession());
-        const lessonId = location.state?.lessonId || extractLessonId(sessionPayload);
-        const moduleId = location.state?.moduleId || extractModuleId(sessionPayload);
+        const lessonId = location.state?.lessonId || storedContext?.lessonId || extractLessonId(sessionPayload);
+        const moduleId = location.state?.moduleId || storedContext?.moduleId || extractModuleId(sessionPayload);
 
         if (!lessonId) {
           throw new Error('No lesson session was returned from the backend.');
@@ -72,11 +129,19 @@ const HumanAnatomyLessonPage = () => {
         const lessonPayload = extractPayload(lessonData);
         const modulesPayload = extractModules(modulesData);
         const profilePayload = extractPayload(profileData);
+        const defaultModuleId = moduleId || getEntityId(modulesPayload[0], null);
 
         setLesson(lessonPayload);
         setModules(modulesPayload);
         setProfile(profilePayload);
-        setOpenModuleId(moduleId || modulesPayload[0]?.id || modulesPayload[0]?._id || null);
+        setOpenModuleId(defaultModuleId);
+
+        saveLessonContext({
+          session: sessionPayload,
+          lessonId,
+          lessonTitle: lessonPayload?.title || 'Human Anatomy',
+          moduleId: defaultModuleId,
+        });
       } catch (error) {
         if (cancelled) return;
         setPageError(error?.message || 'Unable to load lesson.');
@@ -90,11 +155,111 @@ const HumanAnatomyLessonPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [location.state]);
+  }, [location.state, storedContext?.lessonId, storedContext?.moduleId, storedContext?.session]);
+
+  useEffect(() => {
+    if (!openModuleId || modules.length === 0 || submodulesByModuleId[openModuleId]) return;
+
+    const module = modules.find((entry) => getEntityId(entry) === openModuleId);
+    if (!module) return;
+
+    let cancelled = false;
+
+    async function loadModuleSubmodules() {
+      try {
+        setLoadingModuleId(openModuleId);
+        setModuleErrors((prev) => ({ ...prev, [openModuleId]: '' }));
+
+        const [moduleData, submodulesData] = await Promise.all([
+          getModuleById(openModuleId),
+          getSubmodulesByModuleId(openModuleId),
+        ]);
+
+        if (cancelled) return;
+
+        const modulePayload = extractPayload(moduleData);
+        const mergedModule = {
+          ...module,
+          ...modulePayload,
+        };
+        const moduleTitle = normalizeModuleTitle(mergedModule, module?.title || 'Module');
+        const normalizedSubmodules = extractSubmodules(submodulesData).map((item, index) =>
+          normalizeSubmodule(item, index, moduleTitle)
+        );
+
+        setModules((prev) =>
+          prev.map((entry) =>
+            getEntityId(entry) === openModuleId
+              ? {
+                  ...entry,
+                  ...modulePayload,
+                  title: moduleTitle,
+                }
+              : entry
+          )
+        );
+        setSubmodulesByModuleId((prev) => ({ ...prev, [openModuleId]: normalizedSubmodules }));
+      } catch (error) {
+        if (cancelled) return;
+        setModuleErrors((prev) => ({
+          ...prev,
+          [openModuleId]: error?.message || 'Unable to load lessons for this module.',
+        }));
+      } finally {
+        if (!cancelled) setLoadingModuleId(null);
+      }
+    }
+
+    loadModuleSubmodules();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [modules, openModuleId, submodulesByModuleId]);
 
   const lessonTitle = lesson?.title || 'Human Anatomy';
   const lessonSubject = lesson?.courseName || lesson?.subject || 'SCIENCE';
   const progressValue = profile?.lessonProgress ?? lesson?.progress ?? 35;
+  const currentModuleSubmodules = openModuleId ? submodulesByModuleId[openModuleId] || [] : [];
+
+  const openSubmodule = (module, submodule, index) => {
+    const moduleId = getEntityId(module);
+    const moduleSubmodules = submodulesByModuleId[moduleId] || [];
+    const nextSubmodule = moduleSubmodules[index + 1] || null;
+    const assessmentSubmodule =
+      moduleSubmodules.find((item) => item.isAssessment) || moduleSubmodules[moduleSubmodules.length - 1] || null;
+    const context = {
+      lessonId: getEntityId(lesson, storedContext?.lessonId),
+      lessonTitle,
+      moduleId,
+      moduleTitle: normalizeModuleTitle(module, `Module ${index + 1}`),
+      submoduleId: submodule.id,
+      submoduleTitle: submodule.title,
+      submoduleHasVideo: submodule.hasVideo,
+      submoduleIsAssessment: submodule.isAssessment,
+      nextSubmoduleId: nextSubmodule?.id || null,
+      nextSubmoduleTitle: nextSubmodule?.title || null,
+      nextSubmoduleHasVideo: nextSubmodule?.hasVideo || false,
+      nextSubmoduleIsAssessment: nextSubmodule?.isAssessment || false,
+      assessmentSubmoduleId: assessmentSubmodule?.id || null,
+      assessmentTitle: assessmentSubmodule?.title || 'Module Assessment',
+    };
+
+    setSelectedLessonItem(submodule.id);
+    saveLessonContext(context);
+
+    if (submodule.isAssessment) {
+      navigate('/assessment/module-1', { state: context });
+      return;
+    }
+
+    if (submodule.hasVideo) {
+      navigate('/lesson/human-anatomy/body-planes-cavities', { state: context });
+      return;
+    }
+
+    navigate('/lesson/human-anatomy/notes', { state: context });
+  };
 
   return (
     <div className={styles.page}>
@@ -144,9 +309,12 @@ const HumanAnatomyLessonPage = () => {
         <h2 className={styles.sectionTitle}>Course Content</h2>
 
         {modules.map((module, index) => {
-          const moduleId = module?.id || module?._id || `module-${index}`;
+          const moduleId = getEntityId(module, `module-${index}`);
           const isOpen = openModuleId === moduleId;
-          const moduleTitle = module?.title || `Module ${index + 1}`;
+          const moduleTitle = normalizeModuleTitle(module, `Module ${index + 1}`);
+          const submodules = submodulesByModuleId[moduleId] || [];
+          const moduleError = moduleErrors[moduleId];
+          const isModuleLoading = loadingModuleId === moduleId;
 
           if (!isOpen) {
             return (
@@ -180,68 +348,51 @@ const HumanAnatomyLessonPage = () => {
                 </button>
               </div>
 
-              <button
-                type="button"
-                className={selectedLessonItem === `${moduleId}-notes` ? styles.lessonRowActive : styles.lessonRow}
-                onClick={() => {
-                  setSelectedLessonItem(`${moduleId}-notes`);
-                  navigate('/lesson/human-anatomy/notes', {
-                    state: {
-                      lessonTitle: 'Introduction to Anatomical Terms',
-                      moduleTitle,
-                    },
-                  });
-                }}
-              >
-                <img className={styles.notesIcon} src={Notesicon} alt="Notes icon" />
-                <div className={styles.lessonBody}>
-                  <b className={styles.lessonName}>Introduction to Anatomical Terms</b>
-                  <div className={styles.lessonMeta}>Reading - 10 mins</div>
-                  <div className={styles.completedOk}>Available now</div>
-                </div>
-                <img className={styles.cloudIcon} src={cloudicon} alt="Current module" />
-              </button>
+              {isModuleLoading ? <p className={styles.pageError}>Loading module content...</p> : null}
+              {moduleError ? <p className={styles.pageError}>{moduleError}</p> : null}
 
-              <button
-                type="button"
-                className={selectedLessonItem === `${moduleId}-active` ? styles.lessonRowActive : styles.lessonRow}
-                onClick={() => {
-                  setSelectedLessonItem(`${moduleId}-active`);
-                  navigate('/lesson/human-anatomy/body-planes-cavities');
-                }}
-              >
-                <img className={styles.lessonIconPlay} src={Lessonplay} alt="Play icon" />
-                <div className={styles.lessonBody}>
-                  <b className={selectedLessonItem === `${moduleId}-active` ? styles.lessonNameActive : styles.lessonName}>
-                    Body Planes and Cavities
-                  </b>
-                  <div className={styles.lessonMeta}>Active module</div>
-                  <div className={styles.downloadBad}>Ready to continue</div>
-                </div>
-                {selectedLessonItem === `${moduleId}-active` ? <div className={styles.statusCircle} /> : null}
-              </button>
+              {submodules.map((submodule) => {
+                const isSelected = selectedLessonItem === submodule.id;
+                const rowClass = isSelected ? styles.lessonRowActive : styles.lessonRow;
+                const lessonNameClass = isSelected ? styles.lessonNameActive : styles.lessonName;
+                const icon = submodule.isAssessment ? Question : submodule.hasVideo ? Lessonplay : Notesicon;
+                const trailing = submodule.isAssessment ? (
+                  <img className={styles.lockIcon} src={Greylock} alt="Assessment" />
+                ) : submodule.hasVideo ? (
+                  isSelected ? <div className={styles.statusCircle} /> : null
+                ) : (
+                  <img className={styles.cloudIcon} src={cloudicon} alt="Reading lesson" />
+                );
 
-              <button
-                type="button"
-                className={selectedLessonItem === `${moduleId}-assessment` ? styles.lessonRowActive : styles.lessonRow}
-                onClick={() => setSelectedLessonItem(`${moduleId}-assessment`)}
-              >
-                <img className={styles.lessonIconLock} src={Question} alt="Question icon" />
-                <div className={styles.lessonBody}>
-                  <b
-                    className={
-                      selectedLessonItem === `${moduleId}-assessment`
-                        ? styles.lessonNameActive
-                        : styles.lessonName
-                    }
+                return (
+                  <button
+                    key={submodule.id}
+                    type="button"
+                    className={rowClass}
+                    onClick={() => openSubmodule(module, submodule, submodules.indexOf(submodule))}
                   >
-                    Module Assessment
-                  </b>
-                  <div className={styles.lessonMeta}>Available after completion</div>
-                  <div className={styles.lessonMeta}>Available offline</div>
-                </div>
-                <img className={styles.lockIcon} src={Greylock} alt="Locked" />
-              </button>
+                    <img
+                      className={submodule.isAssessment ? styles.lessonIconLock : submodule.hasVideo ? styles.lessonIconPlay : styles.notesIcon}
+                      src={icon}
+                      alt=""
+                    />
+                    <div className={styles.lessonBody}>
+                      <b className={lessonNameClass}>{submodule.title}</b>
+                      <div className={styles.lessonMeta}>
+                        {submodule.isAssessment
+                          ? 'Assessment'
+                          : submodule.hasVideo
+                          ? 'Video lesson'
+                          : 'Reading lesson'}
+                      </div>
+                      <div className={submodule.isAssessment ? styles.lessonMeta : submodule.hasVideo ? styles.downloadBad : styles.completedOk}>
+                        {submodule.isAssessment ? 'Open assessment' : 'Available now'}
+                      </div>
+                    </div>
+                    {trailing}
+                  </button>
+                );
+              })}
             </section>
           );
         })}
@@ -258,7 +409,13 @@ const HumanAnatomyLessonPage = () => {
           <button
             type="button"
             className={styles.nextButton}
-            onClick={() => navigate('/lesson/human-anatomy/notes')}
+            onClick={() => {
+              const firstSubmodule = currentModuleSubmodules[0];
+              const currentModule = modules.find((item) => getEntityId(item) === openModuleId);
+              if (firstSubmodule && currentModule) {
+                openSubmodule(currentModule, firstSubmodule, 0);
+              }
+            }}
           >
             Next
           </button>

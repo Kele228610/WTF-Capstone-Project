@@ -1,120 +1,123 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Module1AssessmentPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
+import { getModuleAssessment } from '../../api/lessons';
+import { readLessonContext } from '../lessons/lessonContext';
 
+function extractPayload(data) {
+  return data?.data || data;
+}
 
-const QUESTIONS = [
-  {
-    id: 1,
-    text: 'Which plane divides the body into equal left and right halves?',
-    options: ['Midsagittal', 'Transverse', 'Frontal', 'Oblique'],
-    initial: 'Midsagittal',
-  },
-  {
-    id: 2,
-    text: 'The brain is located in which body cavity?',
-    options: ['Thoracic', 'Cranial', 'Abdominal', 'Pelvic'],
-    initial: 'Cranial',
-  },
-  {
-    id: 3,
-    text: 'Which plane divides the body into anterior and posterior portions?',
-    options: ['Sagittal', 'Transverse', 'Frontal', 'Horizontal'],
-    initial: 'Frontal',
-  },
-  {
-    id: 4,
-    text: 'The stomach and intestines are primarily found in the:',
-    options: ['Thoracic Cavity', 'Abdominal Cavity', 'Vertebral Cavity', 'Cranial Cavity'],
-    initial: 'Abdominal Cavity',
-  },
-  {
-    id: 5,
-    text: "What plane is also known as a horizontal plane?",
-    options: ['Transverse', 'Frontal', 'Sagittal', 'Coronal'],
-    initial: 'Transverse',
-  },
-  {
-    id: 6,
-    text: 'The spinal cord is protected within the:',
-    options: ['Ventral Cavity', 'Thoracic Cavity', 'Vertebral Cavity', 'Pelvic Cavity'],
-    initial: 'Vertebral Cavity',
-  },
-  {
-    id: 7,
-    text: 'Which cavity is separated from the abdominal cavity by the diaphragm?',
-    options: ['Thoracic', 'Pelvic', 'Cranial', 'Dorsal'],
-    initial: 'Thoracic',
-  },
-  {
-    id: 8,
-    text: 'The urinary bladder and reproductive organs are in the:',
-    options: ['Abdominal Cavity', 'Pelvic Cavity', 'Thoracic Cavity', 'Cranial Cavity'],
-    initial: 'Pelvic Cavity',
-  },
-  {
-    id: 9,
-    text: "The term 'coronal' is another name for which plane?",
-    options: ['Sagittal', 'Frontal', 'Transverse', 'Median'],
-    initial: 'Frontal',
-  },
-  {
-    id: 10,
-    text: 'Which of these is part of the dorsal body cavity?',
-    options: ['Cranial Cavity', 'Thoracic Cavity', 'Abdominal Cavity', 'Ventral Cavity'],
-    initial: 'Cranial Cavity',
-  },
-];
+function normalizeOption(option) {
+  if (typeof option === 'string') {
+    return { id: option, label: option, value: option };
+  }
 
-const ANSWER_KEY = {
-  1: 'Midsagittal',
-  2: 'Cranial',
-  3: 'Frontal',
-  4: 'Abdominal Cavity',
-  5: 'Transverse',
-  6: 'Vertebral Cavity',
-  7: 'Thoracic',
-  8: 'Pelvic Cavity',
-  9: 'Frontal',
-  10: 'Thoracic Cavity',
-};
+  const label = option?.label || option?.text || option?.optionText || option?.value || option?.name || '';
+  const value = option?.value || label;
+  const id = option?.id || option?._id || value || label;
+  return { id, label, value };
+}
 
-const PASS_MARK = 7;
+function normalizeCorrectAnswer(correctAnswer) {
+  if (typeof correctAnswer === 'object' && correctAnswer) {
+    return normalizeOption(correctAnswer).value;
+  }
+
+  return correctAnswer || '';
+}
+
+function normalizeQuestions(data) {
+  const payload = extractPayload(data);
+  const list = payload?.questions || payload?.quiz || payload?.items || payload;
+
+  if (!Array.isArray(list)) return [];
+
+  return list.map((question, index) => ({
+    id: question?.id || question?._id || question?.questionId || index + 1,
+    text: question?.question || question?.prompt || question?.text || `Question ${index + 1}`,
+    options: Array.isArray(question?.options || question?.choices || question?.answers)
+      ? (question.options || question.choices || question.answers).map(normalizeOption)
+      : [],
+    correctAnswer: normalizeCorrectAnswer(
+      question?.correctAnswer ||
+        question?.answer ||
+        question?.correctOption ||
+        question?.correct_option
+    ),
+  }));
+}
+
+function answersMatch(selectedAnswer, correctAnswer) {
+  return String(selectedAnswer || '').trim().toLowerCase() === String(correctAnswer || '').trim().toLowerCase();
+}
+
+const PASS_MARK = 0.7;
 
 const Module1AssessmentPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const storedContext = readLessonContext();
+  const pageContext = location.state || storedContext || {};
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showResultPopup, setShowResultPopup] = useState(false);
   const [score, setScore] = useState(0);
-  const [answers, setAnswers] = useState(() => {
-    const defaults = {};
-    QUESTIONS.forEach((q) => {
-      defaults[q.id] = q.initial;
-    });
-    return defaults;
-  });
+  const [questions, setQuestions] = useState(Array.isArray(location.state?.questions) ? location.state.questions : []);
+  const [answers, setAnswers] = useState({});
+  const [loading, setLoading] = useState(!Array.isArray(location.state?.questions));
+  const [error, setError] = useState('');
 
-  const selectOption = (questionId, option) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: option }));
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAssessmentQuestions() {
+      if (questions.length > 0) return;
+
+      const assessmentSubmoduleId = pageContext.assessmentSubmoduleId || pageContext.submoduleId;
+      if (!assessmentSubmoduleId) {
+        setError('No assessment was selected.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getModuleAssessment(assessmentSubmoduleId);
+        if (cancelled) return;
+        setQuestions(normalizeQuestions(data));
+      } catch (loadError) {
+        if (cancelled) return;
+        setError(loadError?.message || 'Unable to load assessment questions.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadAssessmentQuestions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pageContext.assessmentSubmoduleId, pageContext.submoduleId, questions.length]);
+
+  const selectOption = (questionId, optionValue) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: optionValue }));
   };
 
   const handleSubmitAssessment = () => {
-    const correctCount = QUESTIONS.reduce((count, question) => {
-      return answers[question.id] === ANSWER_KEY[question.id] ? count + 1 : count;
+    const correctCount = questions.reduce((count, question) => {
+      return answersMatch(answers[question.id], question.correctAnswer) ? count + 1 : count;
     }, 0);
 
     setScore(correctCount);
     setShowResultPopup(true);
   };
 
-  const handleRetakeAssessment = () => {
-    setShowResultPopup(false);
-  };
-
-  const percentage = Math.round((score / 10) * 100);
-  const isPassed = score >= PASS_MARK;
+  const percentage = questions.length ? Math.round((score / questions.length) * 100) : 0;
+  const isPassed = questions.length > 0 ? score / questions.length >= PASS_MARK : false;
 
   return (
     <div className={styles.page}>
@@ -157,32 +160,30 @@ const Module1AssessmentPage = () => {
         <h1 className={styles.title}>Module 1 Assessment</h1>
         <p className={styles.subtitle}>Select the best answer for each question.</p>
 
+        {loading ? <p className={styles.helperText}>Loading assessment questions...</p> : null}
+        {error ? <p className={styles.failedText}>{error}</p> : null}
+
         <section className={styles.questions}>
-          {QUESTIONS.map((q) => (
+          {questions.map((q, index) => (
             <article key={q.id} className={styles.questionCard}>
               <div className={styles.questionHead}>
-                <span className={styles.qNumber}>{q.id}</span>
+                <span className={styles.qNumber}>{index + 1}</span>
                 <h2 className={styles.qText}>{q.text}</h2>
               </div>
 
               <div className={styles.optionsGrid}>
                 {q.options.map((option) => {
-                  const isSelected = answers[q.id] === option;
-                  const isWrong = q.id === 10 && option === 'Cranial Cavity' && isSelected;
-                  const optionClass = isWrong
-                    ? styles.optionWrong
-                    : isSelected
-                    ? styles.optionSelected
-                    : styles.option;
+                  const isSelected = answers[q.id] === option.value;
+                  const optionClass = isSelected ? styles.optionSelected : styles.option;
 
                   return (
                     <button
-                      key={option}
+                      key={option.id}
                       type="button"
                       className={optionClass}
-                      onClick={() => selectOption(q.id, option)}
+                      onClick={() => selectOption(q.id, option.value)}
                     >
-                      {option}
+                      {option.label}
                     </button>
                   );
                 })}
@@ -191,17 +192,18 @@ const Module1AssessmentPage = () => {
           ))}
         </section>
 
-        <p className={styles.helperText}>Ensure all 10 questions are answered before submitting.</p>
+        <p className={styles.helperText}>Ensure all questions are answered before submitting.</p>
 
         <button
           type="button"
           className={styles.submitButton}
           onClick={handleSubmitAssessment}
+          disabled={loading || questions.length === 0}
         >
           Submit Assessment
         </button>
 
-        <p className={styles.syncText}>Answers saved locally will sync when online.</p>
+        <p className={styles.syncText}>Assessment data is loaded from the backend.</p>
       </main>
 
       {showResultPopup ? (
@@ -212,7 +214,7 @@ const Module1AssessmentPage = () => {
             <div className={styles.scoreRingWrap}>
               <div
                 className={`${styles.scoreRing} ${!isPassed ? styles.scoreRingFail : ''}`}
-                style={{ '--score-deg': `${Math.round((score / 10) * 360)}deg` }}
+                style={{ '--score-deg': `${Math.round((percentage / 100) * 360)}deg` }}
               >
                 <div className={styles.scoreRingInner}>
                   <p className={`${styles.popupScore} ${!isPassed ? styles.popupScoreFail : ''}`}>
@@ -223,51 +225,41 @@ const Module1AssessmentPage = () => {
               </div>
             </div>
 
-            {isPassed ? (
-              <>
-                <h3 className={styles.popupHeading}>Great job, Winnie!</h3>
-                <p className={styles.popupSubtext}>
-                  You&apos;ve mastered the basics of Human Anatomy Module 1.
-                </p>
-              </>
-            ) : (
-              <>
-                <h3 className={styles.popupHeading}>Keep Practicing Winnie!</h3>
-                <p className={styles.popupSubtext}>You can retake assessment to improve your score.</p>
-              </>
-            )}
+            <h3 className={styles.popupHeading}>{isPassed ? 'Assessment passed' : 'Assessment not passed'}</h3>
+            <p className={styles.popupSubtext}>
+              {isPassed
+                ? 'You answered enough questions correctly to complete this module assessment.'
+                : 'Review the module content and try again to improve your score.'}
+            </p>
 
             <section className={styles.popupStats}>
               <article className={styles.statCard}>
-                <p className={styles.statTop}>Overall</p>
-                <p className={styles.statValue}>{isPassed ? '+15%' : '+5%'}</p>
-                <p className={styles.statCaption}>PROGRESS GAINED</p>
+                <p className={styles.statTop}>Correct</p>
+                <p className={styles.statValue}>
+                  {score}/{questions.length}
+                </p>
+                <p className={styles.statCaption}>QUESTIONS CORRECT</p>
               </article>
               <article className={styles.statCard}>
-                <p className={styles.statTop}>Time</p>
-                <p className={styles.statValue}>{isPassed ? '12m 45s' : '14m 45s'}</p>
-                <p className={styles.statCaption}>TIME SPENT</p>
+                <p className={styles.statTop}>Module</p>
+                <p className={styles.statValue}>{pageContext.moduleTitle || 'Assessment'}</p>
+                <p className={styles.statCaption}>COMPLETED TOPIC</p>
               </article>
             </section>
-
-            {isPassed ? (
-              <section className={styles.badgeCard}>
-                <div className={styles.badgeIcon}>*</div>
-                <div>
-                  <p className={styles.badgeLabel}>BADGE UNLOCKED</p>
-                  <p className={styles.badgeTitle}>Anatomy Expert</p>
-                </div>
-              </section>
-            ) : null}
 
             <section className={styles.breakdownCard}>
               <p className={styles.breakdownLabel}>MODULE BREAKDOWN</p>
               <div className={styles.breakdownRow}>
-                <p className={styles.breakdownTitle}>Anatomy Module 1</p>
-                <p className={styles.breakdownScore}>{score}/10 Correct</p>
+                <p className={styles.breakdownTitle}>{pageContext.moduleTitle || 'Module 1'}</p>
+                <p className={styles.breakdownScore}>
+                  {score}/{questions.length} Correct
+                </p>
               </div>
               <div className={`${styles.breakdownTrack} ${!isPassed ? styles.breakdownTrackFail : ''}`}>
-                <span className={`${styles.breakdownFill} ${!isPassed ? styles.breakdownFillFail : ''}`} style={{ width: `${score * 10}%` }} />
+                <span
+                  className={`${styles.breakdownFill} ${!isPassed ? styles.breakdownFillFail : ''}`}
+                  style={{ width: `${percentage}%` }}
+                />
               </div>
             </section>
 
@@ -275,7 +267,7 @@ const Module1AssessmentPage = () => {
               <button
                 type="button"
                 className={styles.popupPrimaryButton}
-                onClick={isPassed ? () => navigate('/curriculum') : handleRetakeAssessment}
+                onClick={isPassed ? () => navigate('/curriculum') : () => setShowResultPopup(false)}
               >
                 {isPassed ? 'Next Lesson' : 'Retake Assessment'}
               </button>

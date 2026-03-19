@@ -140,6 +140,11 @@
   font-size: 14px;
 }
 
+.downloadIcon {
+  width: 16px;
+  height: 16px;
+}
+
 .quizCard {
   border: 2px solid rgba(77, 125, 238, 0.45);
   border-radius: 18px;
@@ -219,6 +224,21 @@
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 10px 20px rgba(36, 84, 208, 0.22);
+}
+
+.feedbackSuccess,
+.feedbackError {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.feedbackSuccess {
+  color: #1f7a43;
+}
+
+.feedbackError {
+  color: #c2410c;
 }
 
 .bottomActions {

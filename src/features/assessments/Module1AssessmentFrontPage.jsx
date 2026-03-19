@@ -1,12 +1,96 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Module1AssessmentFrontPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
+import { getModuleAssessment } from '../../api/lessons';
+import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
+
+function extractPayload(data) {
+  return data?.data || data;
+}
+
+function normalizeOption(option) {
+  if (typeof option === 'string') {
+    return { id: option, label: option, value: option };
+  }
+
+  const label = option?.label || option?.text || option?.optionText || option?.value || option?.name || '';
+  const value = option?.value || label;
+  const id = option?.id || option?._id || value || label;
+  return { id, label, value };
+}
+
+function normalizeQuestions(data) {
+  const payload = extractPayload(data);
+  const list = payload?.questions || payload?.quiz || payload?.items || payload;
+
+  if (!Array.isArray(list)) return [];
+
+  return list.map((question, index) => ({
+    id: question?.id || question?._id || question?.questionId || index + 1,
+    text: question?.question || question?.prompt || question?.text || `Question ${index + 1}`,
+    options: Array.isArray(question?.options || question?.choices || question?.answers)
+      ? (question.options || question.choices || question.answers).map(normalizeOption)
+      : [],
+    correctAnswer:
+      question?.correctAnswer ||
+      question?.answer ||
+      question?.correctOption ||
+      question?.correct_option ||
+      '',
+  }));
+}
 
 const Module1AssessmentFrontPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const storedContext = readLessonContext();
+  const pageContext = location.state || storedContext || {};
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAssessment() {
+      const assessmentSubmoduleId = pageContext.assessmentSubmoduleId || pageContext.submoduleId;
+      if (!assessmentSubmoduleId) {
+        setError('No assessment was selected.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getModuleAssessment(assessmentSubmoduleId);
+        if (cancelled) return;
+
+        const normalizedQuestions = normalizeQuestions(data);
+        setQuestions(normalizedQuestions);
+        saveLessonContext({
+          ...pageContext,
+          assessmentSubmoduleId,
+        });
+      } catch (loadError) {
+        if (cancelled) return;
+        setError(loadError?.message || 'Unable to load assessment.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadAssessment();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pageContext.assessmentSubmoduleId, pageContext.submoduleId]);
+
+  const moduleTitle = pageContext.moduleTitle || 'Foundations of Anatomy';
 
   return (
     <div className={styles.page}>
@@ -30,7 +114,7 @@ const Module1AssessmentFrontPage = () => {
         <button
           type="button"
           className={styles.backRow}
-          onClick={() => navigate('/lesson/human-anatomy/notes')}
+          onClick={() => navigate('/lesson/human-anatomy')}
           aria-label="Back to lesson notes"
         >
           <span className={styles.backArrow}>&#8592;</span>
@@ -38,13 +122,13 @@ const Module1AssessmentFrontPage = () => {
         </button>
 
         <section className={styles.heroCard}>
-          <h1 className={styles.heroTitle}>Foundations of Anatomy</h1>
+          <h1 className={styles.heroTitle}>{moduleTitle}</h1>
           <p className={styles.heroSubtitle}>
-            Validate your mastery of anatomical terminology and spatial orientation.
+            Validate your mastery of the concepts covered in this module.
           </p>
           <div className={styles.readyRow}>
             <span className={styles.readyDot} />
-            <span className={styles.readyText}>Ready to Begin</span>
+            <span className={styles.readyText}>{loading ? 'Loading assessment' : 'Ready to Begin'}</span>
           </div>
         </section>
 
@@ -52,39 +136,51 @@ const Module1AssessmentFrontPage = () => {
           <article className={styles.statCard}>
             <div className={styles.statIcon}>?</div>
             <div className={styles.statLabel}>Questions</div>
-            <div className={styles.statValue}>10</div>
+            <div className={styles.statValue}>{questions.length || 0}</div>
           </article>
           <article className={styles.statCard}>
-            <div className={styles.statIcon}>◔</div>
-            <div className={styles.statLabel}>Time</div>
-            <div className={styles.statValue}>15m</div>
+            <div className={styles.statIcon}>T</div>
+            <div className={styles.statLabel}>Status</div>
+            <div className={styles.statValue}>{loading ? '...' : 'Live'}</div>
           </article>
           <article className={styles.statCard}>
-            <div className={styles.statIconRed}>↻</div>
-            <div className={styles.statLabel}>Attempts</div>
-            <div className={styles.statValueRed}>0/3</div>
+            <div className={styles.statIconRed}>!</div>
+            <div className={styles.statLabel}>Errors</div>
+            <div className={styles.statValueRed}>{error ? 1 : 0}</div>
           </article>
         </section>
 
         <section className={styles.tutorCard}>
           <div className={styles.tutorAvatarWrap}>
-            <div className={styles.tutorAvatar}>✦</div>
+            <div className={styles.tutorAvatar}>AI</div>
             <span className={styles.onlineDot} />
           </div>
           <div className={styles.tutorTextWrap}>
             <b className={styles.tutorName}>EduAI Tutor</b>
             <p className={styles.tutorText}>
-              &quot;Great job completing the module! Before we dive into the assessment, would you like to do a
-              quick 2-minute review of the key concepts?&quot;
+              {error || 'Your assessment is ready. Start when you are ready to answer the backend-provided questions.'}
             </p>
           </div>
         </section>
 
-        <button type="button" className={styles.startButton} onClick={() => navigate('/assessment/module-1/questions')}>
-          ▶ Start Assessment
+        <button
+          type="button"
+          className={styles.startButton}
+          onClick={() =>
+            navigate('/assessment/module-1/questions', {
+              state: {
+                ...pageContext,
+                assessmentSubmoduleId: pageContext.assessmentSubmoduleId || pageContext.submoduleId,
+                questions,
+              },
+            })
+          }
+          disabled={loading || Boolean(error)}
+        >
+          Start Assessment
         </button>
-        <button type="button" className={styles.reviewButton}>
-          ⌘ Review Key Concepts
+        <button type="button" className={styles.reviewButton} onClick={() => navigate('/lesson/human-anatomy')}>
+          Back to Module
         </button>
       </main>
     </div>
@@ -92,4 +188,3 @@ const Module1AssessmentFrontPage = () => {
 };
 
 export default Module1AssessmentFrontPage;
-

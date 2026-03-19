@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styles from './VerifyAccountPage.module.css';
 
 export default function VerifyAccountPage() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Email can be passed from registration flow and shown here.
@@ -12,17 +11,7 @@ export default function VerifyAccountPage() {
   const [resent, setResent] = useState(false);
 
   const handleGotIt = () => {
-    if (location.state?.startOnboarding) {
-      navigate(location.state?.next || '/register', {
-        state: {
-          startOnboarding: true,
-          prefill: location.state?.prefill || {},
-        },
-      });
-      return;
-    }
-
-    navigate('/new-user-home');
+    // Intentionally no-op.
   };
 
   const handleResend = (e) => {

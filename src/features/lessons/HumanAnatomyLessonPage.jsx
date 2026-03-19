@@ -205,12 +205,15 @@ const HumanAnatomyLessonPage = () => {
               <button
                 type="button"
                 className={selectedLessonItem === `${moduleId}-active` ? styles.lessonRowActive : styles.lessonRow}
-                onClick={() => setSelectedLessonItem(`${moduleId}-active`)}
+                onClick={() => {
+                  setSelectedLessonItem(`${moduleId}-active`);
+                  navigate('/lesson/human-anatomy/body-planes-cavities');
+                }}
               >
                 <img className={styles.lessonIconPlay} src={Lessonplay} alt="Play icon" />
                 <div className={styles.lessonBody}>
                   <b className={selectedLessonItem === `${moduleId}-active` ? styles.lessonNameActive : styles.lessonName}>
-                    {moduleTitle}
+                    Body Planes and Cavities
                   </b>
                   <div className={styles.lessonMeta}>Active module</div>
                   <div className={styles.downloadBad}>Ready to continue</div>

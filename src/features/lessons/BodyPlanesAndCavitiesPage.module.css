@@ -1,0 +1,363 @@
+.page {
+  min-height: 100vh;
+  background: #f6f8fc;
+  color: #1a2337;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 82px;
+  background: #f8fafc;
+  border-bottom: 1px solid #dde4ef;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconButton {
+  border: 0;
+  background: transparent;
+  color: #1b2338;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: 800;
+  color: #182033;
+}
+
+.notificationIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.main {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 14px 14px 34px;
+}
+
+.backButton {
+  border: 0;
+  background: transparent;
+  color: #1b2338;
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.lessonHeadingRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.lessonHeadingBar {
+  width: 4px;
+  min-height: 28px;
+  margin-top: 4px;
+  background: #4d7dee;
+  border-radius: 999px;
+}
+
+.lessonHeading {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 800;
+  color: #1a2337;
+}
+
+.videoCard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22);
+  margin-bottom: 18px;
+  background: #101828;
+}
+
+.videoImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.9) brightness(0.7);
+}
+
+.playOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 52px;
+  line-height: 1;
+}
+
+.videoControls {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.controlMini {
+  flex: 0 0 auto;
+  font-size: 11px;
+  opacity: 0.95;
+}
+
+.timeline {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.timelineFill {
+  width: 28%;
+  height: 100%;
+  background: #4d7dee;
+}
+
+.timeText {
+  white-space: nowrap;
+}
+
+.notesSection {
+  margin-bottom: 22px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sectionHeadLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b2338;
+}
+
+.downloadLink {
+  border: 0;
+  background: transparent;
+  color: #2756d6;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.downloadIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.noteCard {
+  border: 1px solid #e4e9f2;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fbff 0%, #f2f6fc 100%);
+  padding: 14px;
+  color: #5d677b;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.quizCard {
+  border: 2px solid rgba(77, 125, 238, 0.45);
+  border-radius: 18px;
+  background: #fafcff;
+  padding: 16px 14px 20px;
+  box-shadow: 0 10px 28px rgba(77, 125, 238, 0.08);
+}
+
+.question {
+  margin: 14px 0 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #394356;
+}
+
+.answersList {
+  display: grid;
+  gap: 10px;
+}
+
+.option,
+.optionActive {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f7f9fc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.optionActive {
+  background: #e8f0ff;
+  border-color: #4d7dee;
+  box-shadow: 0 0 0 1px rgba(77, 125, 238, 0.2) inset;
+}
+
+.radio,
+.radioActive {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.8px solid #b8c5d9;
+  flex-shrink: 0;
+}
+
+.radioActive {
+  border-color: #4d7dee;
+  background: radial-gradient(circle, #4d7dee 0 45%, transparent 46%);
+}
+
+.optionLabel {
+  font-size: 14px;
+  color: #71809b;
+  font-weight: 500;
+}
+
+.optionActive .optionLabel {
+  color: #3360df;
+  font-weight: 700;
+}
+
+.submitButton {
+  margin-top: 16px;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: #2454d0;
+  color: #ffffff;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(36, 84, 208, 0.22);
+}
+
+.bottomActions {
+  margin-top: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.outlineButton,
+.primaryButton {
+  min-width: 0;
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+}
+
+.outlineButton {
+  flex: 1;
+  border: 2px solid #2f61dd;
+  background: #ffffff;
+  color: #2f61dd;
+}
+
+.primaryButton {
+  flex: 0 0 96px;
+  border: 0;
+  background: #2454d0;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: 0 22px;
+  }
+
+  .brand {
+    font-size: 26px;
+  }
+
+  .main {
+    max-width: 560px;
+    padding: 18px 20px 40px;
+  }
+
+  .lessonHeading {
+    font-size: 24px;
+  }
+
+  .sectionTitle {
+    font-size: 20px;
+  }
+
+  .videoImage {
+    height: 280px;
+  }
+
+  .noteCard {
+    font-size: 14px;
+  }
+
+  .question {
+    font-size: 16px;
+  }
+
+  .optionLabel {
+    font-size: 15px;
+  }
+
+  .primaryButton {
+    flex-basis: 120px;
+  }
+}

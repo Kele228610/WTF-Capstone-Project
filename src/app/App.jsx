@@ -15,6 +15,7 @@ import NewUserHomePage from '../features/home/NewUserHomePage';
 import CurriculumScreen from '../features/curriculum/CurriculumScreen';
 import HumanAnatomyLessonPage from '../features/lessons/HumanAnatomyLessonPage';
 import HumanAnatomyLessonNotesPage from '../features/lessons/HumanAnatomyLessonNotesPage';
+import BodyPlanesAndCavitiesPage from '../features/lessons/BodyPlanesAndCavitiesPage';
 import Module1AssessmentFrontPage from '../features/assessments/Module1AssessmentFrontPage';
 import Module1AssessmentPage from '../features/assessments/Module1AssessmentPage';
 import ProgressTrackerPage from '../features/progress/ProgressTrackerPage';
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/curriculum-screen" element={<CurriculumScreen />} />
         <Route path="/lesson/human-anatomy" element={<HumanAnatomyLessonPage />} />
         <Route path="/lesson/human-anatomy/notes" element={<HumanAnatomyLessonNotesPage />} />
+        <Route path="/lesson/human-anatomy/body-planes-cavities" element={<BodyPlanesAndCavitiesPage />} />
         <Route path="/assessment/module-1" element={<Module1AssessmentFrontPage />} />
         <Route path="/assessment/module-1/questions" element={<Module1AssessmentPage />} />
         <Route path="/progress-tracker" element={<ProgressTrackerPage />} />

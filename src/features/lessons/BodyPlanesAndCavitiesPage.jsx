@@ -1,37 +1,24 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import styles from './HumanAnatomyLessonNotesPage.module.css';
+import { useNavigate } from 'react-router-dom';
+import styles from './BodyPlanesAndCavitiesPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
+import Lessonthumbnail from '../../assets/images/Lessonthumbnail.jpg';
 import NotesIcon from '../../assets/icons/NotesIcon.svg';
 import KnowledgeIcon from '../../assets/icons/KnowledgeIcon.svg';
-import Downloadicon from '../../assets/icons/Downloadicon.png'; 
+import Downloadicon from '../../assets/icons/Downloadicon.png';
 
-const NOTE_LINES = [
-  'In this lesson, we learn that anatomical terminology provides standardized words used by healthcare professionals to describe the location, position, and relationship of body structures clearly and accurately. All descriptions are based on the anatomical position, where the body stands upright, faces forward, arms are at the sides, palms face forward, and feet are slightly apart. Common directional terms help describe where one body part is relative to another:',
-  '- Superior: toward the head',
-  '- Inferior: toward the feet',
-  '- Anterior: front of the body',
-  '- Posterior: back of the body',
-  "- Medial: closer to the body's midline",
-  '- Lateral: farther from the midline',
-  '- Proximal: closer to the point of attachment',
-  '- Distal: farther from the point of attachment',
-];
+const ANSWERS = ['Nervous System', 'Skeletal System', 'Muscular System'];
 
-const ANSWERS = ['Lateral', 'Medial', 'Distal'];
-
-const HumanAnatomyLessonNotesPage = () => {
+const BodyPlanesAndCavitiesPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-
-  const lessonTitle = location.state?.lessonTitle || 'Introduction to Anatomical Terms';
 
   return (
     <div className={styles.page}>
       <AsideSidebarDrawerNavigation isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <button
@@ -51,48 +38,56 @@ const HumanAnatomyLessonNotesPage = () => {
         <button
           type="button"
           className={styles.backButton}
-          aria-label="Back to lesson"
-          onClick={() => navigate('/lesson/human-anatomy')}
+          aria-label="Back to notes"
+          onClick={() => navigate('/lesson/human-anatomy/notes')}
         >
           &#8592;
         </button>
 
         <div className={styles.lessonHeadingRow}>
           <span className={styles.lessonHeadingBar} />
-          <h1 className={styles.lessonHeading}>{lessonTitle}</h1>
+          <h1 className={styles.lessonHeading}>Body Planes and Cavities</h1>
         </div>
+
+        <section className={styles.videoCard}>
+          <img className={styles.videoImage} src={Lessonthumbnail} alt="Body planes and cavities lesson" />
+          <div className={styles.playOverlay}>&#9654;</div>
+          <div className={styles.videoControls}>
+            <span className={styles.controlMini}>II</span>
+            <div className={styles.timeline}>
+              <div className={styles.timelineFill} />
+            </div>
+            <span className={styles.timeText}>05:02 / 15:00</span>
+            <span className={styles.controlMini}>[]</span>
+          </div>
+        </section>
 
         <section className={styles.notesSection}>
           <div className={styles.sectionHeader}>
-            <img className={styles.sectionIcon} src={NotesIcon} alt="Lesson notes icon" />
-            <h2 className={styles.sectionTitle}>Lesson Notes</h2>
+            <div className={styles.sectionHeadLeft}>
+              <img className={styles.sectionIcon} src={NotesIcon} alt="Lesson notes icon" />
+              <h2 className={styles.sectionTitle}>Lesson Notes</h2>
+            </div>
+            <button type="button" className={styles.downloadLink}>
+              <img className={styles.downloadIcon} src={Downloadicon} alt="Download icon" />
+              <span>Download All</span>
+            </button>
           </div>
 
           <div className={styles.noteCard}>
-            {NOTE_LINES.map((line, index) => (
-              <p key={`${line}-${index}`} className={styles.noteLine}>
-                {line}
-              </p>
-            ))}
+            In this lesson, we explore the core design principles as applied to biological systems.
+            We&apos;ll examine how form follows function in the skeletal framework and the structural
+            efficiency of the human body.
           </div>
-
-          <button type="button" className={styles.downloadLink}>
-            <span className={styles.downloadIcon}>
-              <img src={Downloadicon} alt="Download icon" />
-            </span>
-            Download
-          </button>
         </section>
 
         <section className={styles.quizCard}>
-          <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeadLeft}>
             <img className={styles.sectionIcon} src={KnowledgeIcon} alt="Knowledge check icon" />
             <h2 className={styles.sectionTitle}>Knowledge Check</h2>
           </div>
 
-          <p className={styles.question}>
-            Which anatomical term describes a structure that is closer to the midline of the body?
-          </p>
+          <p className={styles.question}>Which system provides the structural framework for the body?</p>
 
           <div className={styles.answersList}>
             {ANSWERS.map((answer) => {
@@ -125,9 +120,9 @@ const HumanAnatomyLessonNotesPage = () => {
           <button
             type="button"
             className={styles.primaryButton}
-            onClick={() => navigate('/lesson/human-anatomy/body-planes-cavities')}
+            onClick={() => navigate('/assessment/module-1')}
           >
-            Next
+            Take Quiz
           </button>
         </div>
       </main>
@@ -135,4 +130,4 @@ const HumanAnatomyLessonNotesPage = () => {
   );
 };
 
-export default HumanAnatomyLessonNotesPage;
+export default BodyPlanesAndCavitiesPage;

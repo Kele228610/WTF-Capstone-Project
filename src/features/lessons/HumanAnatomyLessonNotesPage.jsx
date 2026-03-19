@@ -1,19 +1,32 @@
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './HumanAnatomyLessonNotesPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
-// import HumanAnatomyImage from '../../assets/images/Human-anatomy-background.png';
-import Lessonthumbnail from '../../assets/images/Lessonthumbnail.jpg';
 import NotesIcon from '../../assets/icons/NotesIcon.svg';
 import KnowledgeIcon from '../../assets/icons/KnowledgeIcon.svg';
-import Downloadicon from '../../assets/icons/Downloadicon.png';
 
+const NOTE_LINES = [
+  'In this lesson, we learn that anatomical terminology provides standardized words used by healthcare professionals to describe the location, position, and relationship of body structures clearly and accurately. All descriptions are based on the anatomical position, where the body stands upright, faces forward, arms are at the sides, palms face forward, and feet are slightly apart. Common directional terms help describe where one body part is relative to another:',
+  '- Superior: toward the head',
+  '- Inferior: toward the feet',
+  '- Anterior: front of the body',
+  '- Posterior: back of the body',
+  "- Medial: closer to the body's midline",
+  '- Lateral: farther from the midline',
+  '- Proximal: closer to the point of attachment',
+  '- Distal: farther from the point of attachment',
+];
+
+const ANSWERS = ['Lateral', 'Medial', 'Distal'];
 
 const HumanAnatomyLessonNotesPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState('skeletal');
+  const [selectedAnswer, setSelectedAnswer] = useState('Medial');
+
+  const lessonTitle = location.state?.lessonTitle || 'Introduction to Anatomical Terms';
 
   return (
     <div className={styles.page}>
@@ -45,75 +58,57 @@ const HumanAnatomyLessonNotesPage = () => {
 
         <div className={styles.lessonHeadingRow}>
           <span className={styles.lessonHeadingBar} />
-          <h1 className={styles.lessonHeading}>Body Planes and Cavities</h1>
+          <h1 className={styles.lessonHeading}>{lessonTitle}</h1>
         </div>
 
-        <section className={styles.videoCard}>
-          <img className={styles.videoImage} src={Lessonthumbnail} alt="Body planes and cavities lesson" />
-          <div className={styles.playOverlay}>&#9654;</div>
-          <div className={styles.videoControls}>
-            <span className={styles.controlMini}>II</span>
-            <div className={styles.timeline}>
-              <div className={styles.timelineFill} />
-            </div>
-            <span className={styles.timeText}>05:02 / 15:00</span>
-            <span className={styles.controlMini}>[]</span>
-          </div>
-        </section>
-
         <section className={styles.notesSection}>
-          <div className={styles.headerContainer}>
-            <img className={styles.notesIcon} src={NotesIcon} alt="Notes icon" />
+          <div className={styles.sectionHeader}>
+            <img className={styles.sectionIcon} src={NotesIcon} alt="Lesson notes icon" />
             <h2 className={styles.sectionTitle}>Lesson Notes</h2>
-            <button type="button" className={styles.downloadButton}>
-              <img className={styles.downloadIcon} src={Downloadicon} alt="Download notes" />
-              <span className={styles.downloadText}>Download All</span>
-            </button>
           </div>
 
           <div className={styles.noteCard}>
-            In this lesson, we explore the core design principles as applied to biological systems. We&apos;ll
-            examine how form follows function in the skeletal framework and the structural efficiency of the
-            human body.
+            {NOTE_LINES.map((line, index) => (
+              <p key={`${line}-${index}`} className={styles.noteLine}>
+                {line}
+              </p>
+            ))}
           </div>
+
+          <button type="button" className={styles.downloadLink}>
+            <span className={styles.downloadGlyph}>+</span>
+            Download
+          </button>
         </section>
 
         <section className={styles.quizCard}>
-          <div className={styles.knowledgeContainer}>
-            <img className={styles.notesIcon} src={KnowledgeIcon} alt="Knowledge check icon" />
+          <div className={styles.sectionHeader}>
+            <img className={styles.sectionIcon} src={KnowledgeIcon} alt="Knowledge check icon" />
             <h2 className={styles.sectionTitle}>Knowledge Check</h2>
           </div>
-          
-          <p className={styles.question}>Which system provides the structural framework for the body?</p>
-          
 
-          <button
-            type="button"
-            className={selectedAnswer === 'nervous' ? styles.optionActive : styles.option}
-            onClick={() => setSelectedAnswer('nervous')}
-            aria-pressed={selectedAnswer === 'nervous'}
-          >
-            <span className={selectedAnswer === 'nervous' ? styles.radioActive : styles.radio} />
-            Nervous System
-          </button>
-          <button
-            type="button"
-            className={selectedAnswer === 'skeletal' ? styles.optionActive : styles.option}
-            onClick={() => setSelectedAnswer('skeletal')}
-            aria-pressed={selectedAnswer === 'skeletal'}
-          >
-            <span className={selectedAnswer === 'skeletal' ? styles.radioActive : styles.radio} />
-            Skeletal System
-          </button>
-          <button
-            type="button"
-            className={selectedAnswer === 'muscular' ? styles.optionActive : styles.option}
-            onClick={() => setSelectedAnswer('muscular')}
-            aria-pressed={selectedAnswer === 'muscular'}
-          >
-            <span className={selectedAnswer === 'muscular' ? styles.radioActive : styles.radio} />
-            Muscular System
-          </button>
+          <p className={styles.question}>
+            Which anatomical term describes a structure that is closer to the midline of the body?
+          </p>
+
+          <div className={styles.answersList}>
+            {ANSWERS.map((answer) => {
+              const isSelected = selectedAnswer === answer;
+
+              return (
+                <button
+                  key={answer}
+                  type="button"
+                  className={isSelected ? styles.optionActive : styles.option}
+                  onClick={() => setSelectedAnswer(answer)}
+                  aria-pressed={isSelected}
+                >
+                  <span className={isSelected ? styles.radioActive : styles.radio} />
+                  <span className={styles.optionLabel}>{answer}</span>
+                </button>
+              );
+            })}
+          </div>
 
           <button type="button" className={styles.submitButton}>
             Submit Answer
@@ -129,7 +124,7 @@ const HumanAnatomyLessonNotesPage = () => {
             className={styles.primaryButton}
             onClick={() => navigate('/assessment/module-1')}
           >
-            Take Quiz
+            Next
           </button>
         </div>
       </main>

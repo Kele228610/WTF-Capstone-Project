@@ -183,13 +183,21 @@ const HumanAnatomyLessonPage = () => {
               <button
                 type="button"
                 className={selectedLessonItem === `${moduleId}-notes` ? styles.lessonRowActive : styles.lessonRow}
-                onClick={() => setSelectedLessonItem(`${moduleId}-notes`)}
+                onClick={() => {
+                  setSelectedLessonItem(`${moduleId}-notes`);
+                  navigate('/lesson/human-anatomy/notes', {
+                    state: {
+                      lessonTitle: 'Introduction to Anatomical Terms',
+                      moduleTitle,
+                    },
+                  });
+                }}
               >
                 <img className={styles.notesIcon} src={Notesicon} alt="Notes icon" />
                 <div className={styles.lessonBody}>
-                  <b className={styles.lessonName}>{lessonTitle}</b>
-                  <div className={styles.lessonMeta}>Module content</div>
-                  <div className={styles.completedOk}>Current lesson</div>
+                  <b className={styles.lessonName}>Introduction to Anatomical Terms</b>
+                  <div className={styles.lessonMeta}>Reading - 10 mins</div>
+                  <div className={styles.completedOk}>Available now</div>
                 </div>
                 <img className={styles.cloudIcon} src={cloudicon} alt="Current module" />
               </button>

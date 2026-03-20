@@ -6,12 +6,28 @@ const API_URL = import.meta.env.VITE_API_URL;
 const AUTH_REFRESH_PATH = "/api/v1/auth/refresh-token";
 const NO_REFRESH_RETRY_PATHS = ["/api/v1/auth/login", "/api/v1/auth/refresh-token"];
 const SESSION_HINT_KEY = "edulearn_session_expected";
+const ACCESS_TOKEN_STORAGE_KEY = "edulearn_access_token";
 const PUBLIC_AUTH_PATHS = ["/login", "/register", "/verify-account", "/verify-email"];
 let accessTokenMemory = null;
 
 
 export function getAccessToken() {
   return accessTokenMemory;
+}
+
+function writeAccessToken(accessToken) {
+  if (typeof window === "undefined") return;
+
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, accessToken);
+  } else {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  }
+}
+
+function readStoredAccessToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
 }
 
 function setSessionHint(enabled) {
@@ -28,11 +44,17 @@ function hasSessionHint() {
 
 export function setTokens({ accessToken }) {
   accessTokenMemory = accessToken || null;
-  if (accessToken) setSessionHint(true);
+  writeAccessToken(accessToken || null);
+  if (accessToken) {
+    setSessionHint(true);
+  } else {
+    setSessionHint(false);
+  }
 }
 
 export function clearTokens() {
   accessTokenMemory = null;
+  writeAccessToken(null);
   setSessionHint(false);
 }
 
@@ -122,6 +144,13 @@ export async function refreshAccessToken() {
 }
 
 export async function bootstrapAuthSession() {
+  const storedAccessToken = readStoredAccessToken();
+  if (storedAccessToken) {
+    accessTokenMemory = storedAccessToken;
+    setSessionHint(true);
+    return true;
+  }
+
   if (!hasSessionHint()) return false;
 
   try {

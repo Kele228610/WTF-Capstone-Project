@@ -48,7 +48,7 @@ const ReturningUserHomePage = () => {
   };
 
   const handleAssistantSubmit = async (event) => {
-    event.preventDefault();
+    event?.preventDefault?.();
 
     const question = assistantInput.trim();
     if (!question || assistantSending) return;
@@ -89,6 +89,12 @@ const ReturningUserHomePage = () => {
     } finally {
       setAssistantSending(false);
     }
+  };
+
+  const handleAssistantKeyDown = (event) => {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    handleAssistantSubmit();
   };
 
   return (
@@ -465,7 +471,7 @@ const ReturningUserHomePage = () => {
                 ))}
               </div>
 
-              <form className={styles.assistantInputRow} onSubmit={handleAssistantSubmit}>
+              <div className={styles.assistantInputRow}>
                 <button type="button" className={styles.iconButton} aria-label="Attach file">
                   +
                 </button>
@@ -476,19 +482,21 @@ const ReturningUserHomePage = () => {
                   aria-label="Ask AI assistant"
                   value={assistantInput}
                   onChange={(event) => setAssistantInput(event.target.value)}
+                  onKeyDown={handleAssistantKeyDown}
                 />
                 <button type="button" className={styles.iconButton} aria-label="Voice input">
                   o
                 </button>
                 <button
-                  type="submit"
+                  type="button"
                   className={styles.sendButton}
                   aria-label="Send message"
                   disabled={assistantSending || !assistantInput.trim()}
+                  onClick={handleAssistantSubmit}
                 >
                   &gt;
                 </button>
-              </form>
+              </div>
               {assistantError ? <p className={styles.assistantError}>{assistantError}</p> : null}
             </footer>
           </div>

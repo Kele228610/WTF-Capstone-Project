@@ -1037,6 +1037,51 @@
   color: #64748b;
 }
 
+.assistantThread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.assistantMessageRow,
+.userMessageRow {
+  display: flex;
+}
+
+.assistantMessageRow {
+  justify-content: flex-start;
+}
+
+.userMessageRow {
+  justify-content: flex-end;
+}
+
+.assistantMessageBubble,
+.userMessageBubble,
+.assistantTypingBubble {
+  max-width: 85%;
+  border-radius: 18px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.assistantMessageBubble,
+.assistantTypingBubble {
+  background: #e8eef8;
+  color: #1e293b;
+  border-top-left-radius: 6px;
+}
+
+.userMessageBubble {
+  background: #1f56d1;
+  color: #fff;
+  border-top-right-radius: 6px;
+}
+
 .assistantComposer {
   padding: 12px 12px 14px;
   background: #f8fafc;
@@ -1107,6 +1152,17 @@
   font-size: 17px;
   line-height: 1;
   cursor: pointer;
+}
+
+.sendButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.assistantError {
+  margin: 8px 4px 0;
+  font-size: 12px;
+  color: #c2410c;
 }
 
 @media (max-width: 768px) {

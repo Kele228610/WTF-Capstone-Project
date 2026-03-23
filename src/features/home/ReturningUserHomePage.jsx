@@ -10,11 +10,21 @@ import Badgecup from '../../assets/icons/Badgecup.png';
 import Aistars from '../../assets/icons/Aistars.png';
 import Bluequestion from '../../assets/icons/Bluequestion.png';
 import Notebook from '../../assets/icons/Notebook.png';
+import { sendAiChat } from '../../api/ai';
 
+const assistantChips = [
+  'Explain simply',
+  'Give a real-life example',
+  'Summarize this',
+];
 
 const ReturningUserHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [assistantInput, setAssistantInput] = useState('');
+  const [assistantMessages, setAssistantMessages] = useState([]);
+  const [assistantSending, setAssistantSending] = useState(false);
+  const [assistantError, setAssistantError] = useState('');
   const navigate = useNavigate();
 
   const handleOpenSidebar = () => setIsSidebarOpen(true);
@@ -32,6 +42,54 @@ const ReturningUserHomePage = () => {
       document.body.style.overflow = overflow;
     };
   }, [isAssistantOpen]);
+
+  const handleAssistantChip = (text) => {
+    setAssistantInput(text);
+  };
+
+  const handleAssistantSubmit = async (event) => {
+    event.preventDefault();
+
+    const question = assistantInput.trim();
+    if (!question || assistantSending) return;
+
+    setAssistantMessages((prev) => [
+      ...prev,
+      {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        text: question,
+      },
+    ]);
+    setAssistantInput('');
+    setAssistantError('');
+    setAssistantSending(true);
+
+    try {
+      const data = await sendAiChat(question);
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          text: data.answer || 'No response was returned from the assistant.',
+        },
+      ]);
+    } catch (error) {
+      const message = error?.message || 'Unable to send message right now.';
+      setAssistantError(message);
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-error-${Date.now()}`,
+          role: 'assistant',
+          text: message,
+        },
+      ]);
+    } finally {
+      setAssistantSending(false);
+    }
+  };
 
   return (
     <div className={styles['returning-user-homepage']}>
@@ -65,7 +123,7 @@ const ReturningUserHomePage = () => {
 
       <div className={styles['welcome-section']}>
         <div className={styles['heading-12']}>
-          <b className={styles['welcome-back-winnie']}>Welcome back, Winnie! 👋</b>
+          <b className={styles['welcome-back-winnie']}>Welcome back, Winnie!</b>
         </div>
         <div className={styles.container4}>
           <div className={styles.edulearn}>Ready to continue your learning journey?</div>
@@ -146,11 +204,9 @@ const ReturningUserHomePage = () => {
           <div className={styles.backgroundbordershadow2}>
             <div className={styles.container14}>
               <div className={styles.text5}>
-                {/* <div className={styles.schedule}>schedule</div> */}
                 <img className={styles.scheduleIcon} src={ClockIcon} alt="Schedule" />
               </div>
               <div className={styles.text6}>
-               
                 <b className={styles['time-spent']}>Time Spent</b>
               </div>
             </div>
@@ -193,7 +249,6 @@ const ReturningUserHomePage = () => {
             <div className={styles.container21}>
               <div className={styles.container9}>
                 <img className={styles.Badgecup} src={Badgecup} alt="Badge cup" />
-                {/* <div className={styles['emoji-events']}>emoji_events</div> */}
               </div>
               <div className={styles.container18}>
                 <b className={styles.schedule}>Badges</b>
@@ -231,19 +286,14 @@ const ReturningUserHomePage = () => {
         </div>
       </div>
 
-
-      {/* Recommended lessons */}
-
       <div className={styles['suggested-for-you']}>
         <div className={styles['heading-12']}>
           <b className={styles['recommended-lessons']}>Recommended Lessons</b>
         </div>
 
         <div className={styles.container29}>
-          {/* Lesson card 1 */}
           <div className={styles['lesson-1']}>
-            {/* <img className={styles['background-icon']} alt="" src={Bluequestion} /> */}
-            <img className={styles['Bluequestion']} alt="" src={Bluequestion} />
+            <img className={styles.Bluequestion} alt="" src={Bluequestion} />
             <div className={styles.container30}>
               <div className={styles['heading-4']}>
                 <b className={styles.schedule}>Intro to Genetics</b>
@@ -253,7 +303,6 @@ const ReturningUserHomePage = () => {
                   <div className={styles.lesson}>LESSON</div>
                 </div>
                 <div className={styles.container32}>
-                  {/* <img className={styles['container-icon']} alt="" /> */}
                   <div className={styles.edulearn}>15m</div>
                 </div>
               </div>
@@ -263,9 +312,8 @@ const ReturningUserHomePage = () => {
             </div>
           </div>
 
-          {/* Lesson card 2 */}
           <div className={styles['lesson-1']}>
-            <img className={styles['Notebook']} alt="" src={Notebook} />
+            <img className={styles.Notebook} alt="" src={Notebook} />
             <div className={styles.container30}>
               <div className={styles['heading-4']}>
                 <b className={styles.schedule}>Derivatives</b>
@@ -275,7 +323,6 @@ const ReturningUserHomePage = () => {
                   <div className={styles.lesson}>LESSON</div>
                 </div>
                 <div className={styles.container32}>
-                  <img className={styles['container-icon']} alt="" />
                   <div className={styles.edulearn}>12m</div>
                 </div>
               </div>
@@ -285,10 +332,8 @@ const ReturningUserHomePage = () => {
             </div>
           </div>
 
-          {/* Lesson card 3 */}
           <div className={styles['lesson-1']}>
-            {/* <img className={styles['background-icon']} alt="" /> */}
-             <img className={styles['Notebook']} alt="" src={Notebook} />
+            <img className={styles.Notebook} alt="" src={Notebook} />
             <div className={styles.container30}>
               <div className={styles['heading-4']}>
                 <b className={styles.schedule}>Linear Inequalities</b>
@@ -298,7 +343,6 @@ const ReturningUserHomePage = () => {
                   <div className={styles.lesson}>LESSON</div>
                 </div>
                 <div className={styles.container32}>
-                  <img className={styles['container-icon']} alt="" />
                   <div className={styles.edulearn}>20m</div>
                 </div>
               </div>
@@ -308,10 +352,8 @@ const ReturningUserHomePage = () => {
             </div>
           </div>
 
-          {/* Lesson card 4 */}
           <div className={styles['lesson-1']}>
-            {/* <img className={styles['background-icon']} alt="" /> */}
-            <img className={styles['Notebook']} alt="" src={Notebook} />
+            <img className={styles.Notebook} alt="" src={Notebook} />
             <div className={styles.container30}>
               <div className={styles['heading-4']}>
                 <b className={styles.schedule}>The Periodic Table</b>
@@ -321,7 +363,6 @@ const ReturningUserHomePage = () => {
                   <div className={styles.lesson}>LESSON</div>
                 </div>
                 <div className={styles.container32}>
-                  <img className={styles['container-icon']} alt="" />
                   <div className={styles.edulearn}>25m</div>
                 </div>
               </div>
@@ -342,7 +383,6 @@ const ReturningUserHomePage = () => {
         <div className={styles['floating-ai-assistant-button2']} />
         <div className={styles.container42}>
           <img className={styles.aistarsIcon} src={Aistars} alt="AI Stars" />
-          {/* <div className={styles.text11}></div> */}
         </div>
       </button>
 
@@ -360,7 +400,7 @@ const ReturningUserHomePage = () => {
                   <b className={styles.assistantTitle}>EduAI Assistant</b>
                   <div className={styles.assistantStatusRow}>
                     <span className={styles.statusDot} />
-                    <span className={styles.assistantStatus}>Local AI Mode</span>
+                    <span className={styles.assistantStatus}>Online</span>
                   </div>
                 </div>
               </div>
@@ -377,32 +417,79 @@ const ReturningUserHomePage = () => {
 
             <section className={styles.assistantMessages}>
               <p className={styles.assistantTime}>Today, 10:45 AM</p>
-              <div className={styles.assistantEmptyState}>
-                <p className={styles.assistantEmptyTitle}>Start a new conversation</p>
-                <p className={styles.assistantEmptyCopy}>
-                  Ask any lesson question and your AI assistant will help right here.
-                </p>
-              </div>
+              {assistantMessages.length === 0 ? (
+                <div className={styles.assistantEmptyState}>
+                  <p className={styles.assistantEmptyTitle}>Start a new conversation</p>
+                  <p className={styles.assistantEmptyCopy}>
+                    Ask any lesson question and your AI assistant will help right here.
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.assistantThread}>
+                  {assistantMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={
+                        message.role === 'user' ? styles.userMessageRow : styles.assistantMessageRow
+                      }
+                    >
+                      <div
+                        className={
+                          message.role === 'user' ? styles.userMessageBubble : styles.assistantMessageBubble
+                        }
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {assistantSending ? (
+                <div className={styles.assistantMessageRow}>
+                  <div className={styles.assistantTypingBubble}>Thinking...</div>
+                </div>
+              ) : null}
             </section>
 
             <footer className={styles.assistantComposer}>
               <div className={styles.assistantChipRow}>
-                <button type="button" className={styles.assistantChip}>Explain simply</button>
-                <button type="button" className={styles.assistantChip}>Give real-life example</button>
-                <button type="button" className={styles.assistantChip}>Summarize this</button>
+                {assistantChips.map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    className={styles.assistantChip}
+                    onClick={() => handleAssistantChip(chip)}
+                  >
+                    {chip}
+                  </button>
+                ))}
               </div>
 
-              <form className={styles.assistantInputRow} onSubmit={(event) => event.preventDefault()}>
-                <button type="button" className={styles.iconButton} aria-label="Attach file">⌘</button>
+              <form className={styles.assistantInputRow} onSubmit={handleAssistantSubmit}>
+                <button type="button" className={styles.iconButton} aria-label="Attach file">
+                  +
+                </button>
                 <input
                   type="text"
                   className={styles.assistantInput}
                   placeholder="Ask EDUlearn AI anything..."
                   aria-label="Ask AI assistant"
+                  value={assistantInput}
+                  onChange={(event) => setAssistantInput(event.target.value)}
                 />
-                <button type="button" className={styles.iconButton} aria-label="Voice input">◦</button>
-                <button type="submit" className={styles.sendButton} aria-label="Send message">➤</button>
+                <button type="button" className={styles.iconButton} aria-label="Voice input">
+                  o
+                </button>
+                <button
+                  type="submit"
+                  className={styles.sendButton}
+                  aria-label="Send message"
+                  disabled={assistantSending || !assistantInput.trim()}
+                >
+                  &gt;
+                </button>
               </form>
+              {assistantError ? <p className={styles.assistantError}>{assistantError}</p> : null}
             </footer>
           </div>
         </div>

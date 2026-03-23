@@ -11,12 +11,18 @@ import Aistars from '../../assets/icons/Aistars.png';
 import Bluequestion from '../../assets/icons/Bluequestion.png';
 import Notebook from '../../assets/icons/Notebook.png';
 import { sendAiChat } from '../../api/ai';
+import { getProfile } from '../../api/profile';
 
 const assistantChips = [
   'Explain simply',
   'Give a real-life example',
   'Summarize this',
 ];
+
+function getFirstName(profile) {
+  const fullName = profile?.fullName || profile?.name || '';
+  return fullName.trim().split(/\s+/)[0] || 'Student';
+}
 
 const ReturningUserHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,6 +31,7 @@ const ReturningUserHomePage = () => {
   const [assistantMessages, setAssistantMessages] = useState([]);
   const [assistantSending, setAssistantSending] = useState(false);
   const [assistantError, setAssistantError] = useState('');
+  const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
 
   const handleOpenSidebar = () => setIsSidebarOpen(true);
@@ -42,6 +49,28 @@ const ReturningUserHomePage = () => {
       document.body.style.overflow = overflow;
     };
   }, [isAssistantOpen]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        setProfile(data?.data || data);
+      } catch {
+        if (!cancelled) {
+          setProfile(null);
+        }
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleAssistantChip = (text) => {
     setAssistantInput(text);
@@ -97,6 +126,8 @@ const ReturningUserHomePage = () => {
     handleAssistantSubmit();
   };
 
+  const firstName = getFirstName(profile);
+
   return (
     <div className={styles['returning-user-homepage']}>
       <AsideSidebarDrawerNavigation isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
@@ -129,7 +160,7 @@ const ReturningUserHomePage = () => {
 
       <div className={styles['welcome-section']}>
         <div className={styles['heading-12']}>
-          <b className={styles['welcome-back-winnie']}>Welcome back, Winnie!</b>
+          <b className={styles['welcome-back-winnie']}>Welcome back, {firstName}!</b>
         </div>
         <div className={styles.container4}>
           <div className={styles.edulearn}>Ready to continue your learning journey?</div>

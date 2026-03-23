@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './AsideSidebarDrawerNavigation.module.css';
 import Crosscloseicon from '../../assets/icons/Crosscloseicon.png';
@@ -10,9 +10,47 @@ import Settingsicon from '../../assets/icons/Settingsicon.png';
 import Signout from '../../assets/icons/Signouticon.png';
 import Chevronright from '../../assets/icons/Chevronright.png';
 import UserProfile from '../../assets/images/User Profile.png';
+import { getProfile } from '../../api/profile';
 
 const AsideSidebarDrawerNavigation = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        setProfile(data?.data || data);
+      } catch {
+        if (!cancelled) {
+          setProfile(null);
+        }
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
+
+  const fullName = useMemo(
+    () => profile?.fullName || profile?.name || 'Student',
+    [profile]
+  );
+  const roleLabel = useMemo(() => {
+    const classLevel = profile?.classLevel;
+    if (profile?.role) return profile.role;
+    if (classLevel === 'SENIOR') return 'Senior High Student';
+    if (classLevel === 'JUNIOR') return 'Junior High Student';
+    return 'Student';
+  }, [profile]);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -45,10 +83,10 @@ const AsideSidebarDrawerNavigation = ({ isOpen, onClose }) => {
 
             <div className={styles.container3}>
               <div className={styles['heading-2']}>
-                <b className={styles['winnie-jones']}>Winnie Jones</b>
+                <b className={styles['winnie-jones']}>{fullName}</b>
               </div>
               <div className={styles.container4}>
-                <div className={styles['senior-high-student']}>Senior High Student</div>
+                <div className={styles['senior-high-student']}>{roleLabel}</div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './CurriculumScreen.module.css';
 import { useNavigate } from 'react-router-dom';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
@@ -8,11 +8,47 @@ import Aistars from '../../assets/icons/Aistars.png';
 import Humananatomy from '../../assets/images/Human-anatomy-background.png';
 import Calculus from '../../assets/images/Calculus-image.png';
 import Additionicon from '../../assets/icons/Additionicon.png';
+import { getProfile } from '../../api/profile';
 
 
 const CurriculumScreen = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        setProfile(data?.data || data);
+      } catch {
+        if (!cancelled) {
+          setProfile(null);
+        }
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const mySubjects = useMemo(() => {
+    if (Array.isArray(profile?.courseNames) && profile.courseNames.length > 0) {
+      return profile.courseNames;
+    }
+    if (Array.isArray(profile?.courses) && profile.courses.length > 0) {
+      return profile.courses.map((course) =>
+        typeof course === 'string' ? course : course?.title || course?.name || ''
+      ).filter(Boolean);
+    }
+    return ['Math', 'Science', 'English', 'ICT'];
+  }, [profile]);
 
   return (
     <div className={styles['curriculum-screen']}>
@@ -157,18 +193,11 @@ const CurriculumScreen = () => {
               <b className={styles['subjects']}>My Subjects</b>
             </div>
             <div className={styles['container28']}>
-              <div className={styles['overlayborder']}>
-                <div className={styles['my-courses']}>Math</div>
-              </div>
-              <div className={styles['overlayborder']}>
-                <div className={styles['my-courses']}>Science</div>
-              </div>
-              <div className={styles['overlayborder']}>
-                <div className={styles['my-courses']}>English</div>
-              </div>
-              <div className={styles['overlayborder']}>
-                <div className={styles['my-courses']}>ICT</div>
-              </div>
+              {mySubjects.map((subject) => (
+                <div key={subject} className={styles['overlayborder']}>
+                  <div className={styles['my-courses']}>{subject}</div>
+                </div>
+              ))}
             </div>
           </div>
           <div className={styles['section-3-add-new-subjects']}>

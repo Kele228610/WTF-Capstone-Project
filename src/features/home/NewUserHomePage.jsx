@@ -34,6 +34,31 @@ const assistantChips = [
   'Summarize this',
 ];
 
+function getFirstName(profile) {
+  const fullName = profile?.fullName || profile?.name || '';
+  return fullName.trim().split(/\s+/)[0] || 'Student';
+}
+
+function getPrimaryCourse(profile) {
+  if (Array.isArray(profile?.courseNames) && profile.courseNames.length > 0) {
+    return profile.courseNames[0];
+  }
+  if (Array.isArray(profile?.courses) && profile.courses.length > 0) {
+    const firstCourse = profile.courses[0];
+    return typeof firstCourse === 'string' ? firstCourse : firstCourse?.title || firstCourse?.name || '';
+  }
+  return '';
+}
+
+function formatCourseName(courseName) {
+  if (!courseName) return 'your selected course';
+  return courseName
+    .toString()
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
 const NewUserHomePage = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -81,6 +106,8 @@ const NewUserHomePage = () => {
 
   const lessonProgress = profile?.lessonProgress ?? 0;
   const dailyGoal = profile?.dailyGoal || '30mins';
+  const firstName = getFirstName(profile);
+  const primaryCourse = formatCourseName(getPrimaryCourse(profile));
 
   const handleStartLesson = async () => {
     try {
@@ -194,7 +221,7 @@ const NewUserHomePage = () => {
 
       <section className={styles.heroCard}>
         <p className={styles.kicker}>AI LEARNING PLAN</p>
-        <h2 className={styles.heroTitle}>Hi Simone! Your study plan for Biology is ready.</h2>
+        <h2 className={styles.heroTitle}>Hi {firstName}! Your study plan for {primaryCourse} is ready.</h2>
         <p className={styles.heroSubtitle}>
           Let&apos;s start with Human Anatomy and build your foundation.
         </p>

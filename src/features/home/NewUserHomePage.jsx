@@ -9,6 +9,7 @@ import Bluequestion from '../../assets/icons/Bluequestion.png';
 import Notebook from '../../assets/icons/Notebook.png';
 import { getProfile } from '../../api/profile';
 import { startLessonSession } from '../../api/lessons';
+import { sendAiChat } from '../../api/ai';
 
 const lessonCards = [
   {
@@ -27,13 +28,24 @@ const lessonCards = [
   }
 ];
 
+const assistantChips = [
+  'Explain simply',
+  'Give a real-life example',
+  'Summarize this',
+];
+
 const NewUserHomePage = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState('');
   const [startingLesson, setStartingLesson] = useState(false);
   const [lessonStartError, setLessonStartError] = useState('');
+  const [assistantInput, setAssistantInput] = useState('');
+  const [assistantMessages, setAssistantMessages] = useState([]);
+  const [assistantSending, setAssistantSending] = useState(false);
+  const [assistantError, setAssistantError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -56,8 +68,70 @@ const NewUserHomePage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isAssistantOpen) return undefined;
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [isAssistantOpen]);
+
   const lessonProgress = profile?.lessonProgress ?? 0;
   const dailyGoal = profile?.dailyGoal || '30mins';
+
+  const handleOpenAssistant = () => setIsAssistantOpen(true);
+  const handleCloseAssistant = () => setIsAssistantOpen(false);
+
+  const handleAssistantChip = (text) => {
+    setAssistantInput(text);
+  };
+
+  const handleAssistantSubmit = async (event) => {
+    event.preventDefault();
+
+    const question = assistantInput.trim();
+    if (!question || assistantSending) return;
+
+    setAssistantMessages((prev) => [
+      ...prev,
+      {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        text: question,
+      },
+    ]);
+    setAssistantInput('');
+    setAssistantError('');
+    setAssistantSending(true);
+
+    try {
+      const data = await sendAiChat(question);
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          text: data.answer || 'No response was returned from the assistant.',
+        },
+      ]);
+    } catch (error) {
+      const message = error?.message || 'Unable to send message right now.';
+      setAssistantError(message);
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-error-${Date.now()}`,
+          role: 'assistant',
+          text: message,
+        },
+      ]);
+    } finally {
+      setAssistantSending(false);
+    }
+  };
 
   const handleStartLesson = async () => {
     try {
@@ -159,7 +233,12 @@ const NewUserHomePage = () => {
       <section className={styles.lessonsSection}>
         <div className={styles.sectionHead}>
           <h3>Recommended Lessons</h3>
-          <button type="button" className={styles.aiHeaderButton} aria-label="Open AI assistant">
+          <button
+            type="button"
+            className={styles.aiHeaderButton}
+            aria-label="Open AI assistant"
+            onClick={handleOpenAssistant}
+          >
             <img src={Aistars} alt="" />
           </button>
           <button type="button" className={styles.linkButton}>View All</button>
@@ -180,6 +259,124 @@ const NewUserHomePage = () => {
           ))}
         </div>
       </section>
+
+      <button
+        type="button"
+        className={styles.floatingAssistantButton}
+        onClick={handleOpenAssistant}
+        aria-label="Open AI assistant"
+      >
+        <img src={Aistars} alt="" />
+      </button>
+
+      {isAssistantOpen ? (
+        <div className={styles.assistantOverlay} role="dialog" aria-modal="true" aria-label="EduAI Assistant">
+          <div className={styles.assistantCard}>
+            <div className={styles.assistantHandle} />
+
+            <header className={styles.assistantHeader}>
+              <div className={styles.assistantHeaderLeft}>
+                <div className={styles.assistantAvatar}>
+                  <img className={styles.assistantAvatarIcon} src={Aistars} alt="AI assistant avatar" />
+                </div>
+                <div>
+                  <b className={styles.assistantTitle}>EduAI Assistant</b>
+                  <div className={styles.assistantStatusRow}>
+                    <span className={styles.statusDot} />
+                    <span className={styles.assistantStatus}>Online</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className={styles.assistantCloseButton}
+                onClick={handleCloseAssistant}
+                aria-label="Close AI assistant"
+              >
+                ×
+              </button>
+            </header>
+
+            <section className={styles.assistantMessages}>
+              <p className={styles.assistantTime}>Today, 10:45 AM</p>
+              {assistantMessages.length === 0 ? (
+                <div className={styles.assistantEmptyState}>
+                  <p className={styles.assistantEmptyTitle}>Start a new conversation</p>
+                  <p className={styles.assistantEmptyCopy}>
+                    Ask any lesson question and your AI assistant will help right here.
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.assistantThread}>
+                  {assistantMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={
+                        message.role === 'user' ? styles.userMessageRow : styles.assistantMessageRow
+                      }
+                    >
+                      <div
+                        className={
+                          message.role === 'user' ? styles.userMessageBubble : styles.assistantMessageBubble
+                        }
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {assistantSending ? (
+                <div className={styles.assistantMessageRow}>
+                  <div className={styles.assistantTypingBubble}>Thinking...</div>
+                </div>
+              ) : null}
+            </section>
+
+            <footer className={styles.assistantComposer}>
+              <div className={styles.assistantChipRow}>
+                {assistantChips.map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    className={styles.assistantChip}
+                    onClick={() => handleAssistantChip(chip)}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+
+              <form className={styles.assistantInputRow} onSubmit={handleAssistantSubmit}>
+                <button type="button" className={styles.assistantIconButton} aria-label="Attach file">
+                  +
+                </button>
+                <input
+                  type="text"
+                  className={styles.assistantInput}
+                  placeholder="Ask EDUlearn AI anything..."
+                  aria-label="Ask AI assistant"
+                  value={assistantInput}
+                  onChange={(event) => setAssistantInput(event.target.value)}
+                />
+                <button type="button" className={styles.assistantIconButton} aria-label="Voice input">
+                  o
+                </button>
+                <button
+                  type="submit"
+                  className={styles.sendButton}
+                  aria-label="Send message"
+                  disabled={assistantSending || !assistantInput.trim()}
+                >
+                  &gt;
+                </button>
+              </form>
+              {assistantError ? <p className={styles.assistantError}>{assistantError}</p> : null}
+            </footer>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 };

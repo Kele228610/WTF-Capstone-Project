@@ -198,8 +198,8 @@ const ReturningUserHomePage = () => {
           <button
             type="button"
             className={styles.button3}
-            onClick={() => navigate('/lesson/human-anatomy')}
-            aria-label="Resume Human Anatomy lesson"
+            onClick={() => navigate('/curriculum')}
+            aria-label="Go to curriculum"
           >
             <div className={styles.buttonshadow} />
             <b className={styles['resume-lesson']}>Resume Lesson</b>

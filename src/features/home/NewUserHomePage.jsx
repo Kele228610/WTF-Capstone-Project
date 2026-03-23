@@ -37,11 +37,11 @@ const assistantChips = [
 const NewUserHomePage = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState('');
   const [startingLesson, setStartingLesson] = useState(false);
   const [lessonStartError, setLessonStartError] = useState('');
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [assistantInput, setAssistantInput] = useState('');
   const [assistantMessages, setAssistantMessages] = useState([]);
   const [assistantSending, setAssistantSending] = useState(false);
@@ -81,6 +81,37 @@ const NewUserHomePage = () => {
 
   const lessonProgress = profile?.lessonProgress ?? 0;
   const dailyGoal = profile?.dailyGoal || '30mins';
+
+  const handleStartLesson = async () => {
+    try {
+      setStartingLesson(true);
+      setLessonStartError('');
+      const session = await startLessonSession();
+      const payload = session?.data || session;
+      const lessonId =
+        payload?.lessonId ||
+        payload?.lesson?.id ||
+        payload?.lesson?._id ||
+        payload?.lesson?._id;
+      const moduleId =
+        payload?.moduleId ||
+        payload?.module?.id ||
+        payload?.module?._id ||
+        payload?.currentModuleId;
+
+      navigate('/lesson/human-anatomy', {
+        state: {
+          lessonId,
+          moduleId,
+          session: payload,
+        },
+      });
+    } catch (error) {
+      setLessonStartError(error?.message || 'Unable to start lesson.');
+    } finally {
+      setStartingLesson(false);
+    }
+  };
 
   const handleOpenAssistant = () => setIsAssistantOpen(true);
   const handleCloseAssistant = () => setIsAssistantOpen(false);
@@ -130,37 +161,6 @@ const NewUserHomePage = () => {
       ]);
     } finally {
       setAssistantSending(false);
-    }
-  };
-
-  const handleStartLesson = async () => {
-    try {
-      setStartingLesson(true);
-      setLessonStartError('');
-      const session = await startLessonSession();
-      const payload = session?.data || session;
-      const lessonId =
-        payload?.lessonId ||
-        payload?.lesson?.id ||
-        payload?.lesson?._id ||
-        payload?.lesson?._id;
-      const moduleId =
-        payload?.moduleId ||
-        payload?.module?.id ||
-        payload?.module?._id ||
-        payload?.currentModuleId;
-
-      navigate('/lesson/human-anatomy', {
-        state: {
-          lessonId,
-          moduleId,
-          session: payload,
-        },
-      });
-    } catch (error) {
-      setLessonStartError(error?.message || 'Unable to start lesson.');
-    } finally {
-      setStartingLesson(false);
     }
   };
 
@@ -260,15 +260,6 @@ const NewUserHomePage = () => {
         </div>
       </section>
 
-      <button
-        type="button"
-        className={styles.floatingAssistantButton}
-        onClick={handleOpenAssistant}
-        aria-label="Open AI assistant"
-      >
-        <img src={Aistars} alt="" />
-      </button>
-
       {isAssistantOpen ? (
         <div className={styles.assistantOverlay} role="dialog" aria-modal="true" aria-label="EduAI Assistant">
           <div className={styles.assistantCard}>
@@ -294,7 +285,7 @@ const NewUserHomePage = () => {
                 onClick={handleCloseAssistant}
                 aria-label="Close AI assistant"
               >
-                ×
+                x
               </button>
             </header>
 

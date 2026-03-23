@@ -9,12 +9,24 @@ import Humananatomy from '../../assets/images/Human-anatomy-background.png';
 import Calculus from '../../assets/images/Calculus-image.png';
 import Additionicon from '../../assets/icons/Additionicon.png';
 import { getProfile } from '../../api/profile';
+import { sendAiChat } from '../../api/ai';
+
+const assistantChips = [
+  'Explain simply',
+  'Give a real-life example',
+  'Summarize this',
+];
 
 
 const CurriculumScreen = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [assistantInput, setAssistantInput] = useState('');
+  const [assistantMessages, setAssistantMessages] = useState([]);
+  const [assistantSending, setAssistantSending] = useState(false);
+  const [assistantError, setAssistantError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -38,6 +50,17 @@ const CurriculumScreen = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isAssistantOpen) return undefined;
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [isAssistantOpen]);
+
   const mySubjects = useMemo(() => {
     if (Array.isArray(profile?.courseNames) && profile.courseNames.length > 0) {
       return profile.courseNames;
@@ -49,6 +72,63 @@ const CurriculumScreen = () => {
     }
     return ['Math', 'Science', 'English', 'ICT'];
   }, [profile]);
+
+  const handleOpenAssistant = () => setIsAssistantOpen(true);
+  const handleCloseAssistant = () => setIsAssistantOpen(false);
+
+  const handleAssistantChip = (text) => {
+    setAssistantInput(text);
+  };
+
+  const handleAssistantSubmit = async (event) => {
+    event?.preventDefault?.();
+
+    const question = assistantInput.trim();
+    if (!question || assistantSending) return;
+
+    setAssistantMessages((prev) => [
+      ...prev,
+      {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        text: question,
+      },
+    ]);
+    setAssistantInput('');
+    setAssistantError('');
+    setAssistantSending(true);
+
+    try {
+      const data = await sendAiChat(question);
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          text: data.answer || 'No response was returned from the assistant.',
+        },
+      ]);
+    } catch (error) {
+      const message = error?.message || 'Unable to send message right now.';
+      setAssistantError(message);
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-error-${Date.now()}`,
+          role: 'assistant',
+          text: message,
+        },
+      ]);
+    } finally {
+      setAssistantSending(false);
+    }
+  };
+
+  const handleAssistantKeyDown = (event) => {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    handleAssistantSubmit();
+  };
 
   return (
     <div className={styles['curriculum-screen']}>
@@ -62,16 +142,6 @@ const CurriculumScreen = () => {
           </div>
         </div>
 
-        {/* <div className={styles['container3']}>
-          <div className={styles['input']}>
-            <div className={styles['container4']}>
-              <div className={styles['search-subjects-or']}>Search subjects or lessons...</div>
-            </div>
-          </div>
-          <div className={styles['container5']}>
-            <div className={styles['text']}>search</div>
-          </div>
-        </div> */}
       </div>
       <div className={styles['header']}>
         <div className={styles['container6']}>
@@ -82,7 +152,6 @@ const CurriculumScreen = () => {
             aria-label="Open sidebar navigation"
           >
             <div className={styles['container7']}>
-              {/* <div className={styles['text2']}>menu</div> */}
               <img className={styles['hamburger-icon']} src={Hamburger} alt="Menu" />
             </div>
           </button>
@@ -93,7 +162,6 @@ const CurriculumScreen = () => {
         <div className={styles['button2']}>
           <div className={styles['container8']}>
             <img className={styles['notification-bell-icon']} src={Notificationbell} alt="Notifications" />
-            {/* <div className={styles['text2']}>Notifications</div> */}
           </div>
           <div className={styles['backgroundborder']} />
         </div>
@@ -210,14 +278,129 @@ const CurriculumScreen = () => {
             </div>
           </div>
         </div>
-        <div className={styles['floating-ai-assistant-button']}>
+        <button
+          type="button"
+          className={styles['floating-ai-assistant-button']}
+          onClick={handleOpenAssistant}
+          aria-label="Open AI assistant"
+        >
           <div className={styles['floating-ai-assistant-button2']} />
           <div className={styles['container31']}>
-            {/* <div className={styles['text4']}>auto_awesome</div> */}
             <img className={styles.aistarsIcon} src={Aistars} alt="AI Stars" />
           </div>
-        </div>
+        </button>
       </div>
+
+      {isAssistantOpen ? (
+        <div className={styles.assistantOverlay} role="dialog" aria-modal="true" aria-label="EduAI Assistant">
+          <div className={styles.assistantCard}>
+            <div className={styles.assistantHandle} />
+
+            <header className={styles.assistantHeader}>
+              <div className={styles.assistantHeaderLeft}>
+                <div className={styles.assistantAvatar}>
+                  <img className={styles.aistarsIcon} src={Aistars} alt="AI assistant avatar" />
+                </div>
+                <div>
+                  <b className={styles.assistantTitle}>EduAI Assistant</b>
+                  <div className={styles.assistantStatusRow}>
+                    <span className={styles.statusDot} />
+                    <span className={styles.assistantStatus}>Online</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className={styles.assistantCloseButton}
+                onClick={handleCloseAssistant}
+                aria-label="Close AI assistant"
+              >
+                x
+              </button>
+            </header>
+
+            <section className={styles.assistantMessages}>
+              <p className={styles.assistantTime}>Today, 10:45 AM</p>
+              {assistantMessages.length === 0 ? (
+                <div className={styles.assistantEmptyState}>
+                  <p className={styles.assistantEmptyTitle}>Start a new conversation</p>
+                  <p className={styles.assistantEmptyCopy}>
+                    Ask any lesson question and your AI assistant will help right here.
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.assistantThread}>
+                  {assistantMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={
+                        message.role === 'user' ? styles.userMessageRow : styles.assistantMessageRow
+                      }
+                    >
+                      <div
+                        className={
+                          message.role === 'user' ? styles.userMessageBubble : styles.assistantMessageBubble
+                        }
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {assistantSending ? (
+                <div className={styles.assistantMessageRow}>
+                  <div className={styles.assistantTypingBubble}>Thinking...</div>
+                </div>
+              ) : null}
+            </section>
+
+            <footer className={styles.assistantComposer}>
+              <div className={styles.assistantChipRow}>
+                {assistantChips.map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    className={styles.assistantChip}
+                    onClick={() => handleAssistantChip(chip)}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+
+              <div className={styles.assistantInputRow}>
+                <button type="button" className={styles.assistantIconButton} aria-label="Attach file">
+                  +
+                </button>
+                <input
+                  type="text"
+                  className={styles.assistantInput}
+                  placeholder="Ask EDUlearn AI anything..."
+                  aria-label="Ask AI assistant"
+                  value={assistantInput}
+                  onChange={(event) => setAssistantInput(event.target.value)}
+                  onKeyDown={handleAssistantKeyDown}
+                />
+                <button type="button" className={styles.assistantIconButton} aria-label="Voice input">
+                  o
+                </button>
+                <button
+                  type="button"
+                  className={styles.sendButton}
+                  aria-label="Send message"
+                  disabled={assistantSending || !assistantInput.trim()}
+                  onClick={handleAssistantSubmit}
+                >
+                  &gt;
+                </button>
+              </div>
+              {assistantError ? <p className={styles.assistantError}>{assistantError}</p> : null}
+            </footer>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

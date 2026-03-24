@@ -136,6 +136,11 @@
   cursor: pointer;
 }
 
+.downloadLink:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .downloadGlyph {
   font-size: 14px;
 }
@@ -227,7 +232,8 @@
 }
 
 .feedbackSuccess,
-.feedbackError {
+.feedbackError,
+.feedbackInfo {
   margin: 12px 0 0;
   font-size: 13px;
   line-height: 1.4;
@@ -239,6 +245,10 @@
 
 .feedbackError {
   color: #c2410c;
+}
+
+.feedbackInfo {
+  color: #2756d6;
 }
 
 .bottomActions {

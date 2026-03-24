@@ -6,8 +6,9 @@ import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDr
 import NotesIcon from '../../assets/icons/NotesIcon.svg';
 import KnowledgeIcon from '../../assets/icons/KnowledgeIcon.svg';
 import Downloadicon from '../../assets/icons/Downloadicon.png';
-import { getSubmoduleById, getSubmoduleQuiz } from '../../api/lessons';
+import { downloadSubmoduleProgress, getSubmoduleById, getSubmoduleQuiz } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from './lessonContext';
+import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -76,6 +77,9 @@ export default function HumanAnatomyLessonNotesPage() {
   const [completionMessage, setCompletionMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [downloadState, setDownloadState] = useState('');
+  const [isOfflineContent, setIsOfflineContent] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Introduction to Anatomical Terms',
     contentText: '',
@@ -99,6 +103,7 @@ export default function HumanAnatomyLessonNotesPage() {
       try {
         setLoading(true);
         setError('');
+        setIsOfflineContent(false);
 
         const [submoduleData, quizData] = await Promise.all([
           getSubmoduleById(pageContext.submoduleId),
@@ -120,7 +125,23 @@ export default function HumanAnatomyLessonNotesPage() {
         });
       } catch (loadError) {
         if (cancelled) return;
-        setError(loadError?.message || 'Unable to load lesson notes.');
+        try {
+          const cached = await getDownloadedSubmodule(pageContext.submoduleId);
+          if (cancelled) return;
+
+          if (cached?.submodule) {
+            setSubmodule(cached.submodule);
+            setQuiz(cached.quiz || { question: '', options: [], correctAnswer: '' });
+            setIsOfflineContent(true);
+            setDownloadState('Showing your downloaded lesson notes offline.');
+            setError('');
+          } else {
+            setError(loadError?.message || 'Unable to load lesson notes.');
+          }
+        } catch {
+          if (cancelled) return;
+          setError(loadError?.message || 'Unable to load lesson notes.');
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -184,6 +205,36 @@ export default function HumanAnatomyLessonNotesPage() {
     navigate('/lesson/human-anatomy', { state: nextContext });
   };
 
+  const handleDownload = async () => {
+    if (!pageContext.submoduleId || downloading) return;
+
+    try {
+      setDownloading(true);
+      setDownloadState('');
+
+      const downloadPayload = await downloadSubmoduleProgress(pageContext.submoduleId);
+
+      await saveDownloadedSubmodule({
+        submoduleId: pageContext.submoduleId,
+        cachedAt: Date.now(),
+        downloadPayload,
+        submodule,
+        quiz,
+        context: {
+          lessonId: pageContext.lessonId || null,
+          moduleId: pageContext.moduleId || null,
+          submoduleTitle: submodule.title,
+        },
+      });
+
+      setDownloadState('Lesson notes downloaded. This submodule is now available offline.');
+    } catch (downloadError) {
+      setDownloadState(downloadError?.message || 'Unable to download this lesson right now.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <AsideSidebarDrawerNavigation isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
@@ -238,12 +289,15 @@ export default function HumanAnatomyLessonNotesPage() {
               : null}
           </div>
 
-          <button type="button" className={styles.downloadLink}>
+          <button type="button" className={styles.downloadLink} onClick={handleDownload} disabled={downloading}>
             <span className={styles.downloadIcon}>
               <img src={Downloadicon} alt="Download icon" />
             </span>
-            Download
+            {downloading ? 'Downloading...' : 'Download'}
           </button>
+          {downloadState ? (
+            <p className={isOfflineContent ? styles.feedbackSuccess : styles.feedbackInfo}>{downloadState}</p>
+          ) : null}
         </section>
 
         <section className={styles.quizCard}>

@@ -13,11 +13,11 @@ import cloudicon from '../../assets/icons/cloud-icon.png';
 import {
   getLessonById,
   getModuleById,
+  getModuleProgress,
   getModulesByLessonId,
   getSubmodulesByModuleId,
   startLessonSession,
 } from '../../api/lessons';
-import { getProfile } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 
 function extractPayload(data) {
@@ -83,6 +83,24 @@ function normalizeSubmodule(item, index, moduleTitle) {
   };
 }
 
+function extractProgressValue(data) {
+  const payload = extractPayload(data);
+  const progress =
+    payload?.progress ??
+    payload?.moduleProgress ??
+    payload?.completionPercentage ??
+    payload?.percentage ??
+    payload?.percent ??
+    0;
+
+  const numericProgress = Number(progress);
+  if (Number.isFinite(numericProgress)) {
+    return Math.max(0, Math.min(100, numericProgress));
+  }
+
+  return 0;
+}
+
 const HumanAnatomyLessonPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,7 +112,7 @@ const HumanAnatomyLessonPage = () => {
   );
   const [lesson, setLesson] = useState(null);
   const [modules, setModules] = useState([]);
-  const [profile, setProfile] = useState(null);
+  const [moduleProgress, setModuleProgress] = useState(0);
   const [submodulesByModuleId, setSubmodulesByModuleId] = useState({});
   const [loadingModuleId, setLoadingModuleId] = useState(null);
   const [moduleErrors, setModuleErrors] = useState({});
@@ -129,23 +147,21 @@ const HumanAnatomyLessonPage = () => {
           throw new Error('No lesson session was returned from the backend.');
         }
 
-        const [lessonData, modulesData, profileData] = await Promise.all([
+        const [lessonData, modulesData] = await Promise.all([
           getLessonById(lessonId),
           getModulesByLessonId(lessonId),
-          getProfile(),
         ]);
 
         if (cancelled) return;
 
         const lessonPayload = extractPayload(lessonData);
         const modulesPayload = extractModules(modulesData);
-        const profilePayload = extractPayload(profileData);
         const defaultModuleId = moduleId || getEntityId(modulesPayload[0], null);
 
         setLesson(lessonPayload);
         setModules(modulesPayload);
-        setProfile(profilePayload);
         setOpenModuleId(defaultModuleId);
+        setModuleProgress(0);
         setSubmodulesByModuleId({});
         setModuleErrors({});
         loadedSubmoduleModuleIdsRef.current = new Set();
@@ -171,6 +187,30 @@ const HumanAnatomyLessonPage = () => {
       cancelled = true;
     };
   }, [lesson, location.state?.lessonId, location.state?.moduleId, location.state?.session, modules.length, storedContext?.lessonId, storedContext?.moduleId, storedContext?.session]);
+
+  useEffect(() => {
+    if (!openModuleId) return undefined;
+
+    let cancelled = false;
+
+    async function loadModuleProgress() {
+      try {
+        const progressData = await getModuleProgress(openModuleId);
+        if (cancelled) return;
+        setModuleProgress(extractProgressValue(progressData));
+      } catch {
+        if (!cancelled) {
+          setModuleProgress(0);
+        }
+      }
+    }
+
+    loadModuleProgress();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [openModuleId]);
 
   useEffect(() => {
     if (!openModuleId || modules.length === 0) return;
@@ -236,7 +276,7 @@ const HumanAnatomyLessonPage = () => {
 
   const lessonTitle = lesson?.title || 'Human Anatomy';
   const lessonSubject = lesson?.courseName || lesson?.subject || 'SCIENCE';
-  const progressValue = profile?.lessonProgress ?? lesson?.progress ?? 35;
+  const progressValue = moduleProgress;
   const currentModuleSubmodules = openModuleId ? submodulesByModuleId[openModuleId] || [] : [];
 
   const openSubmodule = (module, submodule, index) => {

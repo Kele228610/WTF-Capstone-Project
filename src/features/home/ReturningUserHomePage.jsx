@@ -13,6 +13,16 @@ import Notebook from '../../assets/icons/Notebook.png';
 import { sendAiChat } from '../../api/ai';
 import { getProfile } from '../../api/profile';
 
+function getCurrentTime() {
+  const now = new Date();
+
+  return now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+
 const assistantChips = [
   'Explain simply',
   'Give a real-life example',
@@ -38,6 +48,21 @@ const ReturningUserHomePage = () => {
   const handleCloseSidebar = () => setIsSidebarOpen(false);
   const handleOpenAssistant = () => setIsAssistantOpen(true);
   const handleCloseAssistant = () => setIsAssistantOpen(false);
+
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    if (!isAssistantOpen) return;
+
+    const updateTime = () => setCurrentTime(getCurrentTime());
+
+    updateTime();
+
+    const interval = setInterval(updateTime, 60000);
+
+    return () => clearInterval(interval);
+  }, [isAssistantOpen]);
+
 
   useEffect(() => {
     if (!isAssistantOpen) return undefined;
@@ -453,7 +478,7 @@ const ReturningUserHomePage = () => {
             </header>
 
             <section className={styles.assistantMessages}>
-              <p className={styles.assistantTime}>Today, 10:45 AM</p>
+              <p className={styles.assistantTime}>Today, {currentTime}</p>
               {assistantMessages.length === 0 ? (
                 <div className={styles.assistantEmptyState}>
                   <p className={styles.assistantEmptyTitle}>Start a new conversation</p>

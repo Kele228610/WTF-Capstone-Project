@@ -138,26 +138,8 @@ const NewUserHomePage = () => {
     try {
       setStartingLesson(true);
       setLessonStartError('');
-      const session = await startLessonSession();
-      const payload = session?.data || session;
-      const lessonId =
-        payload?.lessonId ||
-        payload?.lesson?.id ||
-        payload?.lesson?._id ||
-        payload?.lesson?._id;
-      const moduleId =
-        payload?.moduleId ||
-        payload?.module?.id ||
-        payload?.module?._id ||
-        payload?.currentModuleId;
-
-      navigate('/lesson/human-anatomy', {
-        state: {
-          lessonId,
-          moduleId,
-          session: payload,
-        },
-      });
+      await startLessonSession();
+      navigate('/curriculum');
     } catch (error) {
       setLessonStartError(error?.message || 'Unable to start lesson.');
     } finally {

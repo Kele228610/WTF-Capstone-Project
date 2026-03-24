@@ -137,7 +137,7 @@ const CurriculumScreen = () => {
   }, [profile]);
 
   const primaryLessonTitle = primaryLesson?.title || 'Human Anatomy';
-   console.log(primaryLesson.description);
+  //  console.log(primaryLesson.description);
   const primaryLessonDescription = primaryLesson?.description || 'Introduction to the Human Body Systems';
   const primaryLessonProgressLabel = `${primaryLessonProgress}%`;
 

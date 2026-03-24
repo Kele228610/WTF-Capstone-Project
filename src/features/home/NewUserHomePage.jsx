@@ -11,6 +11,16 @@ import { getProfile } from '../../api/profile';
 import { startLessonSession } from '../../api/lessons';
 import { sendAiChat } from '../../api/ai';
 
+function getCurrentTime() {
+  const now = new Date();
+
+  return now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+
 const lessonCards = [
   {
     id: 'periodic-table',
@@ -71,6 +81,21 @@ const NewUserHomePage = () => {
   const [assistantMessages, setAssistantMessages] = useState([]);
   const [assistantSending, setAssistantSending] = useState(false);
   const [assistantError, setAssistantError] = useState('');
+
+  const [currentTime, setCurrentTime] = useState('');
+
+   useEffect(() => {
+    if (!isAssistantOpen) return;
+
+    const updateTime = () => setCurrentTime(getCurrentTime());
+
+    updateTime();
+
+    const interval = setInterval(updateTime, 60000);
+
+    return () => clearInterval(interval);
+  }, [isAssistantOpen]);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -323,7 +348,7 @@ const NewUserHomePage = () => {
             </header>
 
             <section className={styles.assistantMessages}>
-              <p className={styles.assistantTime}>Today, 10:45 AM</p>
+              <p className={styles.assistantTime}>Today, {currentTime}</p>
               {assistantMessages.length === 0 ? (
                 <div className={styles.assistantEmptyState}>
                   <p className={styles.assistantEmptyTitle}>Start a new conversation</p>
@@ -379,7 +404,7 @@ const NewUserHomePage = () => {
                 <input
                   type="text"
                   className={styles.assistantInput}
-                  placeholder="Ask EDUlearn AI anything..."
+                  placeholder="Ask EduLearn AI anything..."
                   aria-label="Ask AI assistant"
                   value={assistantInput}
                   onChange={(event) => setAssistantInput(event.target.value)}

@@ -137,6 +137,7 @@ const CurriculumScreen = () => {
   }, [profile]);
 
   const primaryLessonTitle = primaryLesson?.title || 'Human Anatomy';
+   console.log(primaryLesson.description);
   const primaryLessonDescription = primaryLesson?.description || 'Introduction to the Human Body Systems';
   const primaryLessonProgressLabel = `${primaryLessonProgress}%`;
 
@@ -267,7 +268,7 @@ const CurriculumScreen = () => {
                   <div className={styles['container15']}>
                     <div className={styles['heading-1']}>
                       <div className={styles['lessons-available-offline-container']}>
-                        <span className={styles['lessons']}>{`2/9 Lessons    `}</span>
+                        <span className={styles['lessons']}>{`1/2 Lessons    `}</span>
                         <span className={styles['available-offline']}>Available Offline</span>
                       </div>
                     </div>

@@ -6,7 +6,7 @@ import Hamburger from '../../assets/icons/Hamburger.png';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import Aistars from '../../assets/icons/Aistars.png';
 import Humananatomy from '../../assets/images/Human-anatomy-background.png';
-// import Calculus from '../../assets/images/Calculus-image.png';
+import Calculus from '../../assets/images/Calculus-image.png';
 import Additionicon from '../../assets/icons/Additionicon.png';
 import { getProfile } from '../../api/profile';
 import { sendAiChat } from '../../api/ai';
@@ -172,7 +172,7 @@ const CurriculumScreen = () => {
         <div className={styles['section-1-my-courses']}>
           <div className={styles['container9']}>
             <div clasName={styles['container2']}>
-              <div className={styles['my-courses']}>My Lessons</div>
+              <div className={styles['my-courses']}>My Lesson</div>
             </div>
             <div className={styles['button3']}>
               <div className={styles['my-courses']}>See All</div>
@@ -218,7 +218,7 @@ const CurriculumScreen = () => {
                 </button>
               </div>
             </div>
-            {/* <div className={styles['biology-card']}>
+            <div className={styles['biology-card']}>
               <img className={styles['image-icon']} src={Calculus} alt="Calculus" />
               <div className={styles['container11']}>
                 
@@ -254,7 +254,7 @@ const CurriculumScreen = () => {
                   </div>
                 </div>
               </div>
-            </div>*/}
+            </div>
           </div>
           <div className={styles['section-2-my-interests']}>
             <div className={styles['heading-1']}>

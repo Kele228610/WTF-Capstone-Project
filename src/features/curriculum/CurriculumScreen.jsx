@@ -10,6 +10,7 @@ import Calculus from '../../assets/images/Calculus-image.png';
 import Additionicon from '../../assets/icons/Additionicon.png';
 import { getProfile } from '../../api/profile';
 import { sendAiChat } from '../../api/ai';
+import { getLessonById, getModuleProgress, startLessonSession } from '../../api/lessons';
 
 const assistantChips = [
   'Explain simply',
@@ -17,11 +18,43 @@ const assistantChips = [
   'Summarize this',
 ];
 
+function extractPayload(data) {
+  return data?.data || data || {};
+}
+
+function extractLessonId(payload) {
+  return payload?.lessonId || payload?.lesson?.id || payload?.lesson?._id || null;
+}
+
+function extractModuleId(payload) {
+  return payload?.moduleId || payload?.module?.id || payload?.module?._id || payload?.currentModuleId || null;
+}
+
+function extractProgressValue(payload) {
+  const progress =
+    payload?.progress ??
+    payload?.moduleProgress ??
+    payload?.completionPercentage ??
+    payload?.percentage ??
+    payload?.percent ??
+    0;
+
+  const numericProgress = Number(progress);
+  if (Number.isFinite(numericProgress)) {
+    return Math.max(0, Math.min(100, numericProgress));
+  }
+
+  return 0;
+}
+
 
 const CurriculumScreen = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [primaryLesson, setPrimaryLesson] = useState(null);
+  const [primaryLessonProgress, setPrimaryLessonProgress] = useState(0);
+  const [primaryLessonContext, setPrimaryLessonContext] = useState(null);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [assistantInput, setAssistantInput] = useState('');
   const [assistantMessages, setAssistantMessages] = useState([]);
@@ -31,19 +64,49 @@ const CurriculumScreen = () => {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadProfile() {
+    async function loadCurriculumData() {
       try {
-        const data = await getProfile();
+        const [profileData, sessionData] = await Promise.all([
+          getProfile(),
+          startLessonSession(),
+        ]);
+
+        const profilePayload = extractPayload(profileData);
+        const sessionPayload = extractPayload(sessionData);
+        const lessonId = extractLessonId(sessionPayload);
+        const moduleId = extractModuleId(sessionPayload);
+
         if (cancelled) return;
-        setProfile(data?.data || data);
+
+        setProfile(profilePayload);
+        setPrimaryLessonContext({
+          lessonId,
+          moduleId,
+          session: sessionPayload,
+        });
+
+        if (!lessonId || !moduleId) return;
+
+        const [lessonData, progressData] = await Promise.all([
+          getLessonById(lessonId),
+          getModuleProgress(moduleId),
+        ]);
+
+        if (cancelled) return;
+
+        setPrimaryLesson(extractPayload(lessonData));
+        setPrimaryLessonProgress(extractProgressValue(extractPayload(progressData)));
       } catch {
         if (!cancelled) {
           setProfile(null);
+          setPrimaryLesson(null);
+          setPrimaryLessonProgress(0);
+          setPrimaryLessonContext(null);
         }
       }
     }
 
-    loadProfile();
+    loadCurriculumData();
 
     return () => {
       cancelled = true;
@@ -72,6 +135,10 @@ const CurriculumScreen = () => {
     }
     return ['Math', 'Science', 'English', 'ICT'];
   }, [profile]);
+
+  const primaryLessonTitle = primaryLesson?.title || 'Human Anatomy';
+  const primaryLessonDescription = primaryLesson?.description || 'Introduction to the Human Body Systems';
+  const primaryLessonProgressLabel = `${primaryLessonProgress}%`;
 
   const handleOpenAssistant = () => setIsAssistantOpen(true);
   const handleCloseAssistant = () => setIsAssistantOpen(false);
@@ -130,6 +197,12 @@ const CurriculumScreen = () => {
     handleAssistantSubmit();
   };
 
+  const handleContinuePrimaryLesson = () => {
+    navigate('/lesson/human-anatomy', {
+      state: primaryLessonContext || undefined,
+    });
+  };
+
   return (
     <div className={styles['curriculum-screen']}>
       <AsideSidebarDrawerNavigation isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
@@ -184,10 +257,10 @@ const CurriculumScreen = () => {
               <div className={styles['container11']}>
                 <div className={styles['container12']}>
                   <div className={styles['heading-1']}>
-                    <b className={styles['human-anatomy']}>Human Anatomy</b>
+                    <b className={styles['human-anatomy']}>{primaryLessonTitle}</b>
                   </div>
                   <div className={styles['container13']}>
-                    <div className={styles['subjects']}>Introduction to the Human Body Systems</div>
+                    <div className={styles['subjects']}>{primaryLessonDescription}</div>
                   </div>
                 </div>
                 <div className={styles['container14']}>
@@ -199,17 +272,17 @@ const CurriculumScreen = () => {
                       </div>
                     </div>
                     <div className={styles['container17']}>
-                      <div className={styles['subjects']}>35%</div>
+                      <div className={styles['subjects']}>{primaryLessonProgressLabel}</div>
                     </div>
                   </div>
                   <div className={styles['background']}>
-                    <div className={styles['background2']} />
+                    <div className={styles['background2']} style={{ width: primaryLessonProgressLabel }} />
                   </div>
                 </div>
                 <button
                   type="button"
                   className={styles['button4']}
-                  onClick={() => navigate('/lesson/human-anatomy')}
+                  onClick={handleContinuePrimaryLesson}
                 >
                   <div className={styles['container7']}>
                     <b className={styles['subjects']}>Continue</b>

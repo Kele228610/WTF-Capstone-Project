@@ -16,6 +16,10 @@ export function getModuleById(moduleId) {
   return apiFetch(`/api/v1/module/${moduleId}`);
 }
 
+export function getModuleProgress(moduleId) {
+  return apiFetch(`/api/v1/progress/module/${moduleId}`);
+}
+
 export function getSubmodulesByModuleId(moduleId) {
   return apiFetch(`/api/v1/submodule/all/${moduleId}`);
 }

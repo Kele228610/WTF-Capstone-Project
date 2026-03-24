@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Module1AssessmentFrontPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
-import { getModuleAssessment } from '../../api/lessons';
+import { downloadSubmoduleProgress, getModuleAssessment } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
+import { getDownloadedAssessment, saveDownloadedAssessment } from '../lessons/offlineLessonStorage';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -51,6 +52,7 @@ const Module1AssessmentFrontPage = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [offlineMessage, setOfflineMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -71,13 +73,43 @@ const Module1AssessmentFrontPage = () => {
 
         const normalizedQuestions = normalizeQuestions(data);
         setQuestions(normalizedQuestions);
+        setOfflineMessage('');
         saveLessonContext({
           ...pageContext,
           assessmentSubmoduleId,
         });
+        try {
+          const downloadPayload = await downloadSubmoduleProgress(assessmentSubmoduleId);
+          if (cancelled) return;
+          await saveDownloadedAssessment({
+            assessmentSubmoduleId,
+            cachedAt: Date.now(),
+            downloadPayload,
+            questions: normalizedQuestions,
+            context: {
+              moduleTitle: pageContext.moduleTitle || 'Foundations of Anatomy',
+            },
+          });
+        } catch {
+          // Keep assessment usable online even if download caching fails.
+        }
       } catch (loadError) {
         if (cancelled) return;
-        setError(loadError?.message || 'Unable to load assessment.');
+        try {
+          const cached = await getDownloadedAssessment(assessmentSubmoduleId);
+          if (cancelled) return;
+
+          if (Array.isArray(cached?.questions) && cached.questions.length > 0) {
+            setQuestions(cached.questions);
+            setOfflineMessage('Showing your downloaded assessment offline.');
+            setError('');
+          } else {
+            setError(loadError?.message || 'Unable to load assessment.');
+          }
+        } catch {
+          if (cancelled) return;
+          setError(loadError?.message || 'Unable to load assessment.');
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -130,6 +162,7 @@ const Module1AssessmentFrontPage = () => {
             <span className={styles.readyDot} />
             <span className={styles.readyText}>{loading ? 'Loading assessment' : 'Ready to Begin'}</span>
           </div>
+          {offlineMessage ? <p className={styles.heroSubtitle}>{offlineMessage}</p> : null}
         </section>
 
         <section className={styles.statsGrid}>

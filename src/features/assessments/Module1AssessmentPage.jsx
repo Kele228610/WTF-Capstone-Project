@@ -5,6 +5,7 @@ import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
 import { getModuleAssessment } from '../../api/lessons';
 import { readLessonContext } from '../lessons/lessonContext';
+import { getDownloadedAssessment } from '../lessons/offlineLessonStorage';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -68,6 +69,7 @@ const Module1AssessmentPage = () => {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(!Array.isArray(location.state?.questions));
   const [error, setError] = useState('');
+  const [offlineMessage, setOfflineMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -88,9 +90,24 @@ const Module1AssessmentPage = () => {
         const data = await getModuleAssessment(assessmentSubmoduleId);
         if (cancelled) return;
         setQuestions(normalizeQuestions(data));
+        setOfflineMessage('');
       } catch (loadError) {
         if (cancelled) return;
-        setError(loadError?.message || 'Unable to load assessment questions.');
+        try {
+          const cached = await getDownloadedAssessment(assessmentSubmoduleId);
+          if (cancelled) return;
+
+          if (Array.isArray(cached?.questions) && cached.questions.length > 0) {
+            setQuestions(cached.questions);
+            setOfflineMessage('Showing your downloaded assessment offline.');
+            setError('');
+          } else {
+            setError(loadError?.message || 'Unable to load assessment questions.');
+          }
+        } catch {
+          if (cancelled) return;
+          setError(loadError?.message || 'Unable to load assessment questions.');
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -168,6 +185,7 @@ const Module1AssessmentPage = () => {
 
         {loading ? <p className={styles.helperText}>Loading assessment questions...</p> : null}
         {error ? <p className={styles.failedText}>{error}</p> : null}
+        {offlineMessage ? <p className={styles.helperText}>{offlineMessage}</p> : null}
 
         <section className={styles.questions}>
           {questions.map((q, index) => (

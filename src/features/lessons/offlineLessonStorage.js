@@ -1,6 +1,7 @@
 const DB_NAME = 'edulearn-offline';
 const DB_VERSION = 1;
 const SUBMODULE_STORE = 'downloaded-submodules';
+const ASSESSMENT_STORE = 'downloaded-assessments';
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -12,6 +13,10 @@ function openDatabase() {
         const store = db.createObjectStore(SUBMODULE_STORE, { keyPath: 'submoduleId' });
         store.createIndex('cachedAt', 'cachedAt');
       }
+      if (!db.objectStoreNames.contains(ASSESSMENT_STORE)) {
+        const store = db.createObjectStore(ASSESSMENT_STORE, { keyPath: 'assessmentSubmoduleId' });
+        store.createIndex('cachedAt', 'cachedAt');
+      }
     };
 
     request.onsuccess = () => resolve(request.result);
@@ -19,10 +24,10 @@ function openDatabase() {
   });
 }
 
-function runTransaction(mode, handler) {
+function runTransaction(storeName, mode, handler) {
   return openDatabase().then((db) => new Promise((resolve, reject) => {
-    const transaction = db.transaction(SUBMODULE_STORE, mode);
-    const store = transaction.objectStore(SUBMODULE_STORE);
+    const transaction = db.transaction(storeName, mode);
+    const store = transaction.objectStore(storeName);
 
     let request;
 
@@ -40,10 +45,17 @@ function runTransaction(mode, handler) {
 }
 
 export async function saveDownloadedSubmodule(record) {
-  return runTransaction('readwrite', (store) => store.put(record));
+  return runTransaction(SUBMODULE_STORE, 'readwrite', (store) => store.put(record));
 }
 
 export async function getDownloadedSubmodule(submoduleId) {
-  return runTransaction('readonly', (store) => store.get(submoduleId));
+  return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.get(submoduleId));
 }
 
+export async function saveDownloadedAssessment(record) {
+  return runTransaction(ASSESSMENT_STORE, 'readwrite', (store) => store.put(record));
+}
+
+export async function getDownloadedAssessment(assessmentSubmoduleId) {
+  return runTransaction(ASSESSMENT_STORE, 'readonly', (store) => store.get(assessmentSubmoduleId));
+}

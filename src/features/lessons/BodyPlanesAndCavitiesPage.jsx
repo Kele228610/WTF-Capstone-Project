@@ -7,8 +7,9 @@ import Lessonthumbnail from '../../assets/images/Lessonthumbnail.jpg';
 import NotesIcon from '../../assets/icons/NotesIcon.svg';
 import KnowledgeIcon from '../../assets/icons/KnowledgeIcon.svg';
 import Downloadicon from '../../assets/icons/Downloadicon.png';
-import { getSubmoduleById, getSubmoduleQuiz } from '../../api/lessons';
+import { downloadSubmoduleProgress, getSubmoduleById, getSubmoduleQuiz } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from './lessonContext';
+import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -70,6 +71,9 @@ export default function BodyPlanesAndCavitiesPage() {
   const [completionMessage, setCompletionMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [downloadState, setDownloadState] = useState('');
+  const [isOfflineContent, setIsOfflineContent] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Body Planes and Cavities',
     contentText: '',
@@ -94,6 +98,7 @@ export default function BodyPlanesAndCavitiesPage() {
       try {
         setLoading(true);
         setError('');
+        setIsOfflineContent(false);
 
         const [submoduleData, quizData] = await Promise.all([
           getSubmoduleById(pageContext.submoduleId),
@@ -115,7 +120,23 @@ export default function BodyPlanesAndCavitiesPage() {
         });
       } catch (loadError) {
         if (cancelled) return;
-        setError(loadError?.message || 'Unable to load video lesson.');
+        try {
+          const cached = await getDownloadedSubmodule(pageContext.submoduleId);
+          if (cancelled) return;
+
+          if (cached?.submodule) {
+            setSubmodule(cached.submodule);
+            setQuiz(cached.quiz || { question: '', options: [], correctAnswer: '' });
+            setIsOfflineContent(true);
+            setDownloadState('Showing your downloaded video lesson offline.');
+            setError('');
+          } else {
+            setError(loadError?.message || 'Unable to load video lesson.');
+          }
+        } catch {
+          if (cancelled) return;
+          setError(loadError?.message || 'Unable to load video lesson.');
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -164,6 +185,36 @@ export default function BodyPlanesAndCavitiesPage() {
 
     saveLessonContext(assessmentContext);
     navigate('/assessment/module-1', { state: assessmentContext });
+  };
+
+  const handleDownload = async () => {
+    if (!pageContext.submoduleId || downloading) return;
+
+    try {
+      setDownloading(true);
+      setDownloadState('');
+
+      const downloadPayload = await downloadSubmoduleProgress(pageContext.submoduleId);
+
+      await saveDownloadedSubmodule({
+        submoduleId: pageContext.submoduleId,
+        cachedAt: Date.now(),
+        downloadPayload,
+        submodule,
+        quiz,
+        context: {
+          lessonId: pageContext.lessonId || null,
+          moduleId: pageContext.moduleId || null,
+          submoduleTitle: submodule.title,
+        },
+      });
+
+      setDownloadState('Video lesson downloaded. This submodule is now available offline.');
+    } catch (downloadError) {
+      setDownloadState(downloadError?.message || 'Unable to download this lesson right now.');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -220,11 +271,14 @@ export default function BodyPlanesAndCavitiesPage() {
               <img className={styles.sectionIcon} src={NotesIcon} alt="Lesson notes icon" />
               <h2 className={styles.sectionTitle}>Lesson Notes</h2>
             </div>
-            <button type="button" className={styles.downloadLink}>
+            <button type="button" className={styles.downloadLink} onClick={handleDownload} disabled={downloading}>
               <img className={styles.downloadIcon} src={Downloadicon} alt="Download icon" />
-              <span>Download All</span>
+              <span>{downloading ? 'Downloading...' : 'Download All'}</span>
             </button>
           </div>
+          {downloadState ? (
+            <p className={isOfflineContent ? styles.feedbackSuccess : styles.feedbackInfo}>{downloadState}</p>
+          ) : null}
 
           <div className={styles.noteCard}>
             {loading ? 'Loading lesson content...' : error || submodule.contentText || 'No lesson notes were returned.'}

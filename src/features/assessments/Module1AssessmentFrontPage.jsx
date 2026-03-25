@@ -6,9 +6,10 @@ import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDr
 import { downloadSubmoduleProgress, getModuleAssessment } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment, saveDownloadedAssessment } from '../lessons/offlineLessonStorage';
-import { BluequestionIcon } from '../../assets/icons/Icons';
-import { TimeIcon } from '../../assets/icons/TimeIcon.png';
-import { AttemptIcon } from '../../assets/icons/Icons';
+import BluequestionIcon from '../../assets/icons/Bluequestion.png';
+import TimeIcon from '../../assets/icons/TimeIcon.png';
+import AttemptIcon from '../../assets/icons/AttemptIcon.png';
+import ResumeIcon from '../../assets/icons/Resume icon.png';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -56,6 +57,7 @@ const Module1AssessmentFrontPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [offlineMessage, setOfflineMessage] = useState('');
+  const [attempts] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -171,19 +173,19 @@ const Module1AssessmentFrontPage = () => {
 
         <section className={styles.statsGrid}>
           <article className={styles.statCard}>
-            <div className={styles.BluequestionIcon}></div>
+            <img className={styles.statImageIcon} src={BluequestionIcon} alt="Questions" />
             <div className={styles.statLabel}>Questions</div>
-            <div className={styles.statValue}>{questions.length || 0}</div>
+            <div className={styles.statValue}>{questions.length || 10}</div>
           </article>
           <article className={styles.statCard}>
-            <div className={styles.TimeIcon}></div>
+            <img className={styles.statImageIcon} src={TimeIcon} alt="Time" />
             <div className={styles.statLabel}>Time</div>
-            <div className={styles.statValue}>{loading ? '...' : 'Live'}</div>
+            <div className={styles.statValue}>{loading ? '...' : '15 mins'}</div>
           </article>
           <article className={styles.statCard}>
-            <div className={styles.AttemptIcon}></div>
+            <img className={styles.statImageIcon} src={AttemptIcon} alt="Attempts" />
             <div className={styles.statLabel}>Attempts</div>
-            <div className={styles.statValueRed}>{error ? 1 : 0}</div>
+            <div className={styles.statValueRed}>{attempts || 0}/3</div>
           </article>
         </section>
 
@@ -214,6 +216,7 @@ const Module1AssessmentFrontPage = () => {
           }
           disabled={!canStartAssessment}
         >
+            <img className={styles.startIcon} src={ResumeIcon} alt="Start Assessment" />
           Start Assessment
         </button>
         <button type="button" className={styles.reviewButton} onClick={() => navigate('/lesson/human-anatomy')}>

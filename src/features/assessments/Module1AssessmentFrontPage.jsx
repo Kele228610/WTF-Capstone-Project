@@ -25,7 +25,7 @@ function normalizeOption(option) {
 
   const label = option?.label || option?.text || option?.optionText || option?.value || option?.name || '';
   const value = option?.value || label;
-  const id = option?.id || option?._id || value || label;
+  const id = option?.id || option?._id || option?.optionId || value || label;
   return { id, label, value };
 }
 
@@ -41,12 +41,6 @@ function normalizeQuestions(data) {
     options: Array.isArray(question?.options || question?.choices || question?.answers)
       ? (question.options || question.choices || question.answers).map(normalizeOption)
       : [],
-    correctAnswer:
-      question?.correctAnswer ||
-      question?.answer ||
-      question?.correctOption ||
-      question?.correct_option ||
-      '',
   }));
 }
 
@@ -118,6 +112,7 @@ const Module1AssessmentFrontPage = () => {
   }, [pageContext.moduleTitle]);
 
   const moduleTitle = pageContext.moduleTitle || 'Foundations of Anatomy';
+  const submitSubmoduleId = pageContext.assessmentSubmoduleId || pageContext.submoduleId || null;
 
   return (
     <div className={styles.page}>
@@ -198,7 +193,8 @@ const Module1AssessmentFrontPage = () => {
             navigate('/assessment/module-1/questions', {
               state: {
                 ...pageContext,
-                assessmentSubmoduleId: ASSESSMENT_CACHE_KEY,
+                assessmentSubmoduleId: submitSubmoduleId,
+                assessmentCacheKey: ASSESSMENT_CACHE_KEY,
                 questions,
               },
             })

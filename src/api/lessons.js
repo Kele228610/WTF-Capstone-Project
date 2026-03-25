@@ -36,6 +36,16 @@ export function getModuleAssessment() {
   return apiFetch('/api/v1/submodule/quiz/module-all');
 }
 
+export function submitModuleAssessment(submoduleId, answers) {
+  return apiFetch('/api/v1/submodule/quiz/submit', {
+    method: 'POST',
+    body: {
+      submoduleId,
+      answers,
+    },
+  });
+}
+
 export function markSubmoduleComplete(submoduleId) {
   return apiFetch('/api/v1/progress/mark-complete', {
     method: 'POST',

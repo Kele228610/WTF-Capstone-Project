@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Module1AssessmentPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
-import { getModuleAssessment } from '../../api/lessons';
+import { getModuleAssessment, submitModuleAssessment } from '../../api/lessons';
 import { readLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment } from '../lessons/offlineLessonStorage';
 
@@ -20,7 +20,7 @@ function normalizeOption(option) {
 
   const label = option?.label || option?.text || option?.optionText || option?.value || option?.name || '';
   const value = option?.value || label;
-  const id = option?.id || option?._id || value || label;
+  const id = option?.id || option?._id || option?.optionId || value || label;
   return { id, label, value };
 }
 
@@ -44,20 +44,47 @@ function normalizeQuestions(data) {
     options: Array.isArray(question?.options || question?.choices || question?.answers)
       ? (question.options || question.choices || question.answers).map(normalizeOption)
       : [],
-    correctAnswer: normalizeCorrectAnswer(
-      question?.correctAnswer ||
-        question?.answer ||
-        question?.correctOption ||
-        question?.correct_option
-    ),
   }));
 }
 
-function answersMatch(selectedAnswer, correctAnswer) {
-  return String(selectedAnswer || '').trim().toLowerCase() === String(correctAnswer || '').trim().toLowerCase();
-}
-
 const PASS_MARK = 0.7;
+
+function extractSubmissionMetrics(data, totalQuestions) {
+  const payload = extractPayload(data);
+  const score =
+    payload?.score ??
+    payload?.correctCount ??
+    payload?.correctAnswers ??
+    payload?.data?.score ??
+    payload?.data?.correctCount ??
+    0;
+  const percentage =
+    payload?.percentage ??
+    payload?.percent ??
+    payload?.scorePercentage ??
+    payload?.data?.percentage ??
+    payload?.data?.percent;
+  const normalizedScore = Number(score);
+  const normalizedPercentage = Number(percentage);
+  const finalScore = Number.isFinite(normalizedScore) ? normalizedScore : 0;
+  const finalPercentage = Number.isFinite(normalizedPercentage)
+    ? normalizedPercentage
+    : totalQuestions > 0
+    ? Math.round((finalScore / totalQuestions) * 100)
+    : 0;
+  const passedValue =
+    payload?.passed ??
+    payload?.isPassed ??
+    payload?.success ??
+    payload?.data?.passed ??
+    payload?.data?.isPassed;
+
+  return {
+    score: finalScore,
+    percentage: finalPercentage,
+    isPassed: typeof passedValue === 'boolean' ? passedValue : totalQuestions > 0 ? finalScore / totalQuestions >= PASS_MARK : false,
+  };
+}
 
 const Module1AssessmentPage = () => {
   const navigate = useNavigate();
@@ -72,6 +99,7 @@ const Module1AssessmentPage = () => {
   const [loading, setLoading] = useState(!Array.isArray(location.state?.questions));
   const [error, setError] = useState('');
   const [offlineMessage, setOfflineMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,7 +117,7 @@ const Module1AssessmentPage = () => {
       } catch (loadError) {
         if (cancelled) return;
         try {
-          const cached = await getDownloadedAssessment(pageContext.assessmentSubmoduleId || ASSESSMENT_CACHE_KEY);
+          const cached = await getDownloadedAssessment(pageContext.assessmentCacheKey || ASSESSMENT_CACHE_KEY);
           if (cancelled) return;
 
           if (Array.isArray(cached?.questions) && cached.questions.length > 0) {
@@ -113,29 +141,59 @@ const Module1AssessmentPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [pageContext.assessmentSubmoduleId, questions.length]);
+  }, [pageContext.assessmentCacheKey, questions.length]);
 
-  const selectOption = (questionId, optionValue) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionValue }));
+  const selectOption = (questionId, optionId) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
-  const handleSubmitAssessment = () => {
-    const correctCount = questions.reduce((count, question) => {
-      return answersMatch(answers[question.id], question.correctAnswer) ? count + 1 : count;
-    }, 0);
+  const handleSubmitAssessment = async () => {
+    if (!pageContext.assessmentSubmoduleId) {
+      setError('No assessment submodule was selected.');
+      return;
+    }
 
-    setScore(correctCount);
-    setShowResultPopup(true);
+    const formattedAnswers = questions
+      .filter((question) => answers[question.id])
+      .map((question) => ({
+        questionId: question.id,
+        optionId: answers[question.id],
+      }));
+
+    if (formattedAnswers.length !== questions.length) {
+      setError('Answer all questions before submitting.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError('');
+      const result = await submitModuleAssessment(pageContext.assessmentSubmoduleId, formattedAnswers);
+      const metrics = extractSubmissionMetrics(result, questions.length);
+      setScore(metrics.score);
+      setShowResultPopup(true);
+      const popupPercentage = metrics.percentage;
+      setDerivedPercentage(popupPercentage);
+      setDerivedPassed(metrics.isPassed);
+    } catch (submitError) {
+      setError(submitError?.message || 'Unable to submit assessment right now.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleRetakeAssessment = () => {
     setAnswers({});
     setScore(0);
     setShowResultPopup(false);
+    setDerivedPercentage(0);
+    setDerivedPassed(false);
   };
 
-  const percentage = questions.length ? Math.round((score / questions.length) * 100) : 0;
-  const isPassed = questions.length > 0 ? score / questions.length >= PASS_MARK : false;
+  const [derivedPercentage, setDerivedPercentage] = useState(0);
+  const [derivedPassed, setDerivedPassed] = useState(false);
+  const percentage = derivedPercentage || (questions.length ? Math.round((score / questions.length) * 100) : 0);
+  const isPassed = showResultPopup ? derivedPassed || (questions.length > 0 ? score / questions.length >= PASS_MARK : false) : false;
 
   return (
     <div className={styles.page}>
@@ -200,7 +258,7 @@ const Module1AssessmentPage = () => {
                       key={option.id}
                       type="button"
                       className={optionClass}
-                      onClick={() => selectOption(q.id, option.value)}
+                      onClick={() => selectOption(q.id, option.id)}
                     >
                       {option.label}
                     </button>
@@ -217,9 +275,9 @@ const Module1AssessmentPage = () => {
           type="button"
           className={styles.submitButton}
           onClick={handleSubmitAssessment}
-          disabled={loading || questions.length === 0}
+          disabled={loading || questions.length === 0 || submitting}
         >
-          Submit Assessment
+          {submitting ? 'Submitting...' : 'Submit Assessment'}
         </button>
 
         <p className={styles.syncText}>Assessment data is loaded from the backend.</p>

@@ -7,7 +7,12 @@ import Lessonthumbnail from '../../assets/images/Lessonthumbnail.jpg';
 import NotesIcon from '../../assets/icons/NotesIcon.svg';
 import KnowledgeIcon from '../../assets/icons/KnowledgeIcon.svg';
 import Downloadicon from '../../assets/icons/Downloadicon.png';
-import { downloadSubmoduleProgress, getSubmoduleById, getSubmoduleQuiz } from '../../api/lessons';
+import {
+  downloadSubmoduleProgress,
+  getSubmoduleById,
+  getSubmoduleQuiz,
+  markSubmoduleComplete,
+} from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 
@@ -74,6 +79,7 @@ export default function BodyPlanesAndCavitiesPage() {
   const [downloadState, setDownloadState] = useState('');
   const [isOfflineContent, setIsOfflineContent] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [markingComplete, setMarkingComplete] = useState(false);
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Body Planes and Cavities',
     contentText: '',
@@ -166,13 +172,28 @@ export default function BodyPlanesAndCavitiesPage() {
     );
   };
 
-  const handleMarkCompleted = () => {
+  const handleMarkCompleted = async () => {
     if (!quizSubmitted || !answersMatch(selectedAnswer, quiz.correctAnswer)) {
       setCompletionMessage('You need the correct answer before marking this lesson as completed.');
       return;
     }
 
-    navigate('/lesson/human-anatomy');
+    const submoduleId = submodule.id || pageContext.submoduleId;
+    if (!submoduleId) {
+      setCompletionMessage('No submodule was selected to mark as completed.');
+      return;
+    }
+
+    try {
+      setMarkingComplete(true);
+      await markSubmoduleComplete(submoduleId);
+      setCompletionMessage('Lesson marked as completed successfully.');
+      navigate('/lesson/human-anatomy');
+    } catch (completeError) {
+      setCompletionMessage(completeError?.message || 'Unable to mark this lesson as completed right now.');
+    } finally {
+      setMarkingComplete(false);
+    }
   };
 
   const handleNext = () => {
@@ -321,8 +342,8 @@ export default function BodyPlanesAndCavitiesPage() {
         </section>
 
         <div className={styles.bottomActions}>
-          <button type="button" className={styles.outlineButton} onClick={handleMarkCompleted}>
-            Mark as completed
+          <button type="button" className={styles.outlineButton} onClick={handleMarkCompleted} disabled={markingComplete}>
+            {markingComplete ? 'Marking...' : 'Mark as completed'}
           </button>
           <button type="button" className={styles.primaryButton} onClick={handleNext}>
             Take Quiz

@@ -36,6 +36,13 @@ export function getModuleAssessment(submoduleId) {
   return apiFetch(`/api/v1/submodule/quiz/module-all/${submoduleId}`);
 }
 
+export function markSubmoduleComplete(submoduleId) {
+  return apiFetch('/api/v1/progress/mark-complete', {
+    method: 'POST',
+    body: { submoduleId },
+  });
+}
+
 export async function downloadSubmoduleProgress(submoduleId) {
   const token = getAccessToken();
   const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/progress/download/${submoduleId}`, {

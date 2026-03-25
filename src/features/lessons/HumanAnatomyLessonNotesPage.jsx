@@ -86,6 +86,7 @@ export default function HumanAnatomyLessonNotesPage() {
   const [isOfflineContent, setIsOfflineContent] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Introduction to Anatomical Terms',
     contentText: '',
@@ -194,7 +195,7 @@ export default function HumanAnatomyLessonNotesPage() {
       setMarkingComplete(true);
       await markSubmoduleComplete(submoduleId);
       setCompletionMessage('Lesson marked as completed successfully.');
-      navigate('/lesson/human-anatomy');
+      setIsCompleted(true);
     } catch (completeError) {
       setCompletionMessage(completeError?.message || 'Unable to mark this lesson as completed right now.');
     } finally {
@@ -357,8 +358,13 @@ export default function HumanAnatomyLessonNotesPage() {
         </section>
 
         <div className={styles.bottomActions}>
-          <button type="button" className={styles.outlineButton} onClick={handleMarkCompleted} disabled={markingComplete}>
-            {markingComplete ? 'Marking...' : 'Mark as completed'}
+          <button
+            type="button"
+            className={styles.outlineButton}
+            onClick={handleMarkCompleted}
+            disabled={markingComplete || isCompleted}
+          >
+            {markingComplete ? 'Marking...' : isCompleted ? 'Completed' : 'Mark as completed'}
           </button>
           <button type="button" className={styles.primaryButton} onClick={handleNext}>
             Next

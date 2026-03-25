@@ -3,13 +3,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Module1AssessmentFrontPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
-import { downloadSubmoduleProgress, getModuleAssessment } from '../../api/lessons';
+import { getModuleAssessment } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment, saveDownloadedAssessment } from '../lessons/offlineLessonStorage';
 import BluequestionIcon from '../../assets/icons/Bluequestion.png';
 import TimeIcon from '../../assets/icons/TimeIcon.png';
 import AttemptIcon from '../../assets/icons/AttemptIcon.png';
 import ResumeIcon from '../../assets/icons/Resume icon.png';
+
+
+const ASSESSMENT_CACHE_KEY = 'module-all';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -63,17 +66,10 @@ const Module1AssessmentFrontPage = () => {
     let cancelled = false;
 
     async function loadAssessment() {
-      const assessmentSubmoduleId = pageContext.assessmentSubmoduleId || pageContext.submoduleId;
-      if (!assessmentSubmoduleId) {
-        setError('No assessment was selected.');
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError('');
-        const data = await getModuleAssessment(assessmentSubmoduleId);
+        const data = await getModuleAssessment();
         if (cancelled) return;
 
         const normalizedQuestions = normalizeQuestions(data);
@@ -81,27 +77,21 @@ const Module1AssessmentFrontPage = () => {
         setOfflineMessage('');
         saveLessonContext({
           ...pageContext,
-          assessmentSubmoduleId,
+          assessmentSubmoduleId: ASSESSMENT_CACHE_KEY,
         });
-        try {
-          const downloadPayload = await downloadSubmoduleProgress(assessmentSubmoduleId);
-          if (cancelled) return;
-          await saveDownloadedAssessment({
-            assessmentSubmoduleId,
-            cachedAt: Date.now(),
-            downloadPayload,
-            questions: normalizedQuestions,
-            context: {
-              moduleTitle: pageContext.moduleTitle || 'Foundations of Anatomy',
-            },
-          });
-        } catch {
-          // Keep assessment usable online even if download caching fails.
-        }
+        await saveDownloadedAssessment({
+          assessmentSubmoduleId: ASSESSMENT_CACHE_KEY,
+          cachedAt: Date.now(),
+          downloadPayload: null,
+          questions: normalizedQuestions,
+          context: {
+            moduleTitle: pageContext.moduleTitle || 'Foundations of Anatomy',
+          },
+        });
       } catch (loadError) {
         if (cancelled) return;
         try {
-          const cached = await getDownloadedAssessment(assessmentSubmoduleId);
+          const cached = await getDownloadedAssessment(ASSESSMENT_CACHE_KEY);
           if (cancelled) return;
 
           if (Array.isArray(cached?.questions) && cached.questions.length > 0) {
@@ -125,10 +115,9 @@ const Module1AssessmentFrontPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [pageContext.assessmentSubmoduleId, pageContext.submoduleId]);
+  }, [pageContext.moduleTitle]);
 
   const moduleTitle = pageContext.moduleTitle || 'Foundations of Anatomy';
-  const canStartAssessment = !loading && questions.length > 0;
 
   return (
     <div className={styles.page}>
@@ -209,18 +198,17 @@ const Module1AssessmentFrontPage = () => {
             navigate('/assessment/module-1/questions', {
               state: {
                 ...pageContext,
-                assessmentSubmoduleId: pageContext.assessmentSubmoduleId || pageContext.submoduleId,
+                assessmentSubmoduleId: ASSESSMENT_CACHE_KEY,
                 questions,
               },
             })
           }
-          disabled={!canStartAssessment}
         >
             <img className={styles.startIcon} src={ResumeIcon} alt="Start Assessment" />
           Start Assessment
         </button>
         <button type="button" className={styles.reviewButton} onClick={() => navigate('/lesson/human-anatomy')}>
-          Back to Module
+          Review Key Concepts
         </button>
       </main>
     </div>

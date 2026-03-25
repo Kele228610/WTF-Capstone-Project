@@ -32,8 +32,8 @@ export function getSubmoduleQuiz(submoduleId) {
   return apiFetch(`/api/v1/submodule/quiz/${submoduleId}/quiz`);
 }
 
-export function getModuleAssessment(submoduleId) {
-  return apiFetch(`/api/v1/submodule/quiz/module-all/${submoduleId}`);
+export function getModuleAssessment() {
+  return apiFetch('/api/v1/submodule/quiz/module-all');
 }
 
 export function markSubmoduleComplete(submoduleId) {

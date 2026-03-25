@@ -7,6 +7,8 @@ import { getModuleAssessment } from '../../api/lessons';
 import { readLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment } from '../lessons/offlineLessonStorage';
 
+const ASSESSMENT_CACHE_KEY = 'module-all';
+
 function extractPayload(data) {
   return data?.data || data;
 }
@@ -77,24 +79,17 @@ const Module1AssessmentPage = () => {
     async function loadAssessmentQuestions() {
       if (questions.length > 0) return;
 
-      const assessmentSubmoduleId = pageContext.assessmentSubmoduleId || pageContext.submoduleId;
-      if (!assessmentSubmoduleId) {
-        setError('No assessment was selected.');
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError('');
-        const data = await getModuleAssessment(assessmentSubmoduleId);
+        const data = await getModuleAssessment();
         if (cancelled) return;
         setQuestions(normalizeQuestions(data));
         setOfflineMessage('');
       } catch (loadError) {
         if (cancelled) return;
         try {
-          const cached = await getDownloadedAssessment(assessmentSubmoduleId);
+          const cached = await getDownloadedAssessment(pageContext.assessmentSubmoduleId || ASSESSMENT_CACHE_KEY);
           if (cancelled) return;
 
           if (Array.isArray(cached?.questions) && cached.questions.length > 0) {
@@ -118,7 +113,7 @@ const Module1AssessmentPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [pageContext.assessmentSubmoduleId, pageContext.submoduleId, questions.length]);
+  }, [pageContext.assessmentSubmoduleId, questions.length]);
 
   const selectOption = (questionId, optionValue) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionValue }));

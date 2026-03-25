@@ -247,8 +247,8 @@
 .reviewButton {
   margin-top: 12px;
   border: 1.5px solid #1f56d1;
-  background: transparent;
-  color: #1f56d1;
+  background: #1039831A;
+  color: #0e3a9a;
 }
 
 @media (max-width: 1024px) {

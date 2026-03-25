@@ -232,11 +232,11 @@
   box-shadow: 0 6px 14px rgba(31, 86, 209, 0.28);
 }
 
-.startButton:disabled {
+/* .startButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   box-shadow: none;
-}
+} */
 
 .reviewButton {
   margin-top: 12px;

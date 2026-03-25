@@ -6,6 +6,9 @@ import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDr
 import { downloadSubmoduleProgress, getModuleAssessment } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment, saveDownloadedAssessment } from '../lessons/offlineLessonStorage';
+import { BluequestionIcon } from '../../assets/icons/Icons';
+import { TimeIcon } from '../../assets/icons/TimeIcon.png';
+import { AttemptIcon } from '../../assets/icons/Icons';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -168,17 +171,17 @@ const Module1AssessmentFrontPage = () => {
 
         <section className={styles.statsGrid}>
           <article className={styles.statCard}>
-            <div className={styles.statIcon}>?</div>
+            <div className={styles.BluequestionIcon}></div>
             <div className={styles.statLabel}>Questions</div>
             <div className={styles.statValue}>{questions.length || 0}</div>
           </article>
           <article className={styles.statCard}>
-            <div className={styles.statIcon}>T</div>
-            <div className={styles.statLabel}>Status</div>
+            <div className={styles.TimeIcon}></div>
+            <div className={styles.statLabel}>Time</div>
             <div className={styles.statValue}>{loading ? '...' : 'Live'}</div>
           </article>
           <article className={styles.statCard}>
-            <div className={styles.statIconRed}>!</div>
+            <div className={styles.AttemptIcon}></div>
             <div className={styles.statLabel}>Attempts</div>
             <div className={styles.statValueRed}>{error ? 1 : 0}</div>
           </article>

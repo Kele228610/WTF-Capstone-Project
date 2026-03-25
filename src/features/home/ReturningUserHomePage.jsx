@@ -12,6 +12,7 @@ import Bluequestion from '../../assets/icons/Bluequestion.png';
 import Notebook from '../../assets/icons/Notebook.png';
 import { sendAiChat } from '../../api/ai';
 import { getProfile } from '../../api/profile';
+import { getModuleProgress, startLessonSession } from '../../api/lessons';
 
 function getCurrentTime() {
   const now = new Date();
@@ -34,6 +35,31 @@ function getFirstName(profile) {
   return fullName.trim().split(/\s+/)[0] || 'Student';
 }
 
+function extractPayload(data) {
+  return data?.data || data || {};
+}
+
+function extractModuleId(payload) {
+  return payload?.moduleId || payload?.module?.id || payload?.module?._id || payload?.currentModuleId || null;
+}
+
+function extractProgressValue(payload) {
+  const progress =
+    payload?.progress ??
+    payload?.moduleProgress ??
+    payload?.completionPercentage ??
+    payload?.percentage ??
+    payload?.percent ??
+    0;
+
+  const numericProgress = Number(progress);
+  if (Number.isFinite(numericProgress)) {
+    return Math.max(0, Math.min(100, numericProgress));
+  }
+
+  return 0;
+}
+
 const ReturningUserHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
@@ -42,6 +68,7 @@ const ReturningUserHomePage = () => {
   const [assistantSending, setAssistantSending] = useState(false);
   const [assistantError, setAssistantError] = useState('');
   const [profile, setProfile] = useState(null);
+  const [moduleProgress, setModuleProgress] = useState(0);
   const navigate = useNavigate();
 
   const handleOpenSidebar = () => setIsSidebarOpen(true);
@@ -78,19 +105,33 @@ const ReturningUserHomePage = () => {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadProfile() {
+    async function loadProfileAndProgress() {
       try {
-        const data = await getProfile();
+        const [profileData, sessionData] = await Promise.all([
+          getProfile(),
+          startLessonSession(),
+        ]);
+        const sessionPayload = extractPayload(sessionData);
+        const moduleId = extractModuleId(sessionPayload);
+
+        let progressValue = 0;
+        if (moduleId) {
+          const progressData = await getModuleProgress(moduleId);
+          progressValue = extractProgressValue(extractPayload(progressData));
+        }
+
         if (cancelled) return;
-        setProfile(data?.data || data);
+        setProfile(extractPayload(profileData));
+        setModuleProgress(progressValue);
       } catch {
         if (!cancelled) {
           setProfile(null);
+          setModuleProgress(0);
         }
       }
     }
 
-    loadProfile();
+    loadProfileAndProgress();
 
     return () => {
       cancelled = true;
@@ -152,6 +193,7 @@ const ReturningUserHomePage = () => {
   };
 
   const firstName = getFirstName(profile);
+  const moduleProgressLabel = `${moduleProgress}%`;
 
   return (
     <div className={styles['returning-user-homepage']}>
@@ -212,11 +254,11 @@ const ReturningUserHomePage = () => {
 
           <div className={styles.container8}>
             <div className={styles.overlay2}>
-              <div className={styles.background} />
+              <div className={styles.background} style={{ width: moduleProgressLabel }} />
             </div>
 
             <div className={styles.container9}>
-              <div className={styles.div}>80%</div>
+              <div className={styles.div}>{moduleProgressLabel}</div>
             </div>
           </div>
 

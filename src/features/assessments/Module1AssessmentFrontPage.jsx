@@ -179,7 +179,7 @@ const Module1AssessmentFrontPage = () => {
           </article>
           <article className={styles.statCard}>
             <div className={styles.statIconRed}>!</div>
-            <div className={styles.statLabel}>Errors</div>
+            <div className={styles.statLabel}>Attempts</div>
             <div className={styles.statValueRed}>{error ? 1 : 0}</div>
           </article>
         </section>

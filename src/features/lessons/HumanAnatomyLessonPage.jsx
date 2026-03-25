@@ -19,6 +19,8 @@ import {
   startLessonSession,
 } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from './lessonContext';
+import { getDownloadedSubmodule } from './offlineLessonStorage';
+import { readLessonUiState } from './lessonUiState';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -114,6 +116,7 @@ const HumanAnatomyLessonPage = () => {
   const [modules, setModules] = useState([]);
   const [moduleProgress, setModuleProgress] = useState(0);
   const [submodulesByModuleId, setSubmodulesByModuleId] = useState({});
+  const [submoduleStatusById, setSubmoduleStatusById] = useState({});
   const [loadingModuleId, setLoadingModuleId] = useState(null);
   const [moduleErrors, setModuleErrors] = useState({});
   const [pageError, setPageError] = useState('');
@@ -274,6 +277,43 @@ const HumanAnatomyLessonPage = () => {
     };
   }, [modules, openModuleId]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSubmoduleStatuses() {
+      const submodules = Object.values(submodulesByModuleId).flat();
+
+      if (submodules.length === 0) {
+        setSubmoduleStatusById({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        submodules.map(async (submodule) => {
+          const savedUiState = readLessonUiState('anonymous', submodule.id);
+          const cachedSubmodule = await getDownloadedSubmodule(submodule.id);
+
+          return [
+            submodule.id,
+            {
+              isCompleted: Boolean(savedUiState?.isCompleted),
+              isDownloaded: Boolean(cachedSubmodule?.submodule),
+            },
+          ];
+        })
+      );
+
+      if (cancelled) return;
+      setSubmoduleStatusById(Object.fromEntries(entries));
+    }
+
+    loadSubmoduleStatuses();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [submodulesByModuleId]);
+
   const lessonTitle = lesson?.title || 'Human Anatomy';
   const lessonSubject = lesson?.courseName || lesson?.subject || 'SCIENCE';
   const progressValue = moduleProgress;
@@ -413,6 +453,12 @@ const HumanAnatomyLessonPage = () => {
                 const rowClass = isSelected ? styles.lessonRowActive : styles.lessonRow;
                 const lessonNameClass = isSelected ? styles.lessonNameActive : styles.lessonName;
                 const icon = submodule.isAssessment ? Question : submodule.hasVideo ? Lessonplay : Notesicon;
+                const persistedStatus = submoduleStatusById[submodule.id] || {};
+                const availabilityLabel = persistedStatus.isCompleted
+                  ? 'Completed'
+                  : persistedStatus.isDownloaded
+                  ? 'Downloaded'
+                  : 'Available now';
                 const trailing = submodule.isAssessment ? (
                   <img className={styles.lockIcon} src={Greylock} alt="Assessment" />
                 ) : submodule.hasVideo ? (
@@ -443,7 +489,7 @@ const HumanAnatomyLessonPage = () => {
                           : 'Reading lesson'}
                       </div>
                       <div className={submodule.isAssessment ? styles.lessonMeta : submodule.hasVideo ? styles.downloadBad : styles.completedOk}>
-                        {submodule.isAssessment ? 'Open assessment' : 'Available now'}
+                        {submodule.isAssessment ? 'Open assessment' : availabilityLabel}
                       </div>
                     </div>
                     {trailing}

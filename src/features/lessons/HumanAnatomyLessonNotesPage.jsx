@@ -12,8 +12,10 @@ import {
   getSubmoduleQuiz,
   markSubmoduleComplete,
 } from '../../api/lessons';
+import { getProfile } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
+import { readLessonUiState, saveLessonUiState } from './lessonUiState';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -87,6 +89,7 @@ export default function HumanAnatomyLessonNotesPage() {
   const [downloading, setDownloading] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [userId, setUserId] = useState('anonymous');
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Introduction to Anatomical Terms',
     contentText: '',
@@ -96,6 +99,29 @@ export default function HumanAnatomyLessonNotesPage() {
     options: [],
     correctAnswer: '',
   });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfileIdentity() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        const payload = extractPayload(data);
+        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+      } catch {
+        if (!cancelled) {
+          setUserId('anonymous');
+        }
+      }
+    }
+
+    loadProfileIdentity();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -161,8 +187,35 @@ export default function HumanAnatomyLessonNotesPage() {
     };
   }, [pageContext.submoduleId]);
 
+  useEffect(() => {
+    const submoduleId = submodule.id || pageContext.submoduleId;
+    if (!submoduleId) return;
+
+    const savedState = readLessonUiState(userId, submoduleId);
+    if (!savedState) return;
+
+    setSelectedAnswer(savedState.selectedAnswer || null);
+    setQuizSubmitted(Boolean(savedState.quizSubmitted));
+    setIsCompleted(Boolean(savedState.isCompleted));
+    if (savedState.completionMessage) {
+      setCompletionMessage(savedState.completionMessage);
+    }
+  }, [userId, submodule.id, pageContext.submoduleId]);
+
   const noteLines = normalizeNoteLines(submodule.contentText);
   const isCorrect = quizSubmitted && answersMatch(selectedAnswer, quiz.correctAnswer);
+
+  useEffect(() => {
+    const submoduleId = submodule.id || pageContext.submoduleId;
+    if (!submoduleId) return;
+
+    saveLessonUiState(userId, submoduleId, {
+      selectedAnswer,
+      quizSubmitted,
+      isCompleted,
+      completionMessage,
+    });
+  }, [userId, submodule.id, pageContext.submoduleId, selectedAnswer, quizSubmitted, isCompleted, completionMessage]);
 
   const handleSubmitAnswer = () => {
     if (!selectedAnswer) {

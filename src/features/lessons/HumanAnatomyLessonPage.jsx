@@ -443,7 +443,7 @@ const HumanAnatomyLessonPage = () => {
                           : 'Reading lesson'}
                       </div>
                       <div className={submodule.isAssessment ? styles.lessonMeta : submodule.hasVideo ? styles.downloadBad : styles.completedOk}>
-                        {submodule.isAssessment ? 'Open assessment' : 'Available now'}
+                        {submodule.isAssessment ? 'Open assessment' : 'Completed'}
                       </div>
                     </div>
                     {trailing}

@@ -11,12 +11,12 @@ import Icon7 from '../../assets/icons/Icon-7.svg';
 import Icon8 from '../../assets/icons/Icon-8.svg';
 import Icon9 from '../../assets/icons/Icon-9.svg';
 import Icon10 from '../../assets/icons/Icon-10.svg';
-// import Icon11 from '../../assets/icons/Icon-11.svg';
 import Icon12 from '../../assets/icons/Icon-12.svg';
 import Icon13 from '../../assets/icons/Icon-13.svg';
 import Icon14 from '../../assets/icons/Icon-14.svg';
 import Icon15 from '../../assets/icons/Icon-15.svg';
 import Icon16 from '../../assets/icons/Icon-16.svg';
+import redlockouticon from '../../assets/icons/redlogouticon.svg';
 
 
 const ChevronRow = ({ iconSrc, iconAlt, title, subtitle, onClick }) => (
@@ -91,14 +91,14 @@ const SettingsPage = () => {
           <h2 className={styles.sectionTitle}>ACCOUNT</h2>
           <div className={styles.card}>
             <ChevronRow
-              iconSrc={Icon1}
+              iconSrc={Icon16}
               iconAlt="Profile"
               title="Profile"
               onClick={() => navigate('/settings/profile')}
             />
-            <ChevronRow iconSrc={Icon2} iconAlt="Email" title="Email" />
-            <ChevronRow iconSrc={Icon3} iconAlt="Password" title="Password" />
-            <ChevronRow iconSrc={Icon4} iconAlt="Linked Accounts" title="Linked Accounts" />
+            <ChevronRow iconSrc={Icon14} iconAlt="Email" title="Email" />
+            <ChevronRow iconSrc={Icon13} iconAlt="Password" title="Password" />
+            <ChevronRow iconSrc={Icon12} iconAlt="Linked Accounts" title="Linked Accounts" />
           </div>
         </section>
 
@@ -106,7 +106,7 @@ const SettingsPage = () => {
           <h2 className={styles.sectionTitle}>DATA &amp; STORAGE</h2>
           <div className={styles.card}>
             <ToggleRow
-              iconSrc={Icon5}
+              iconSrc={Icon10}
               iconAlt="Offline mode"
               title="Offline Mode"
               subtitle="Access downloaded content offline"
@@ -114,7 +114,7 @@ const SettingsPage = () => {
               onToggle={() => onToggle('offlineMode')}
             />
             <ToggleRow
-              iconSrc={Icon6}
+              iconSrc={Icon9}
               iconAlt="Auto-download"
               title="Auto-Download"
               subtitle="Download new lessons automatically"
@@ -124,7 +124,7 @@ const SettingsPage = () => {
             <div className={styles.storageRow}>
               <div className={styles.rowLeft}>
                 <div className={styles.iconBox}>
-                  <img className={styles.iconImage} src={Icon7} alt="Storage" />
+                  <img className={styles.iconImage} src={Icon8} alt="Storage" />
                 </div>
                 <div className={styles.copyBlock}>
                   <p className={styles.rowTitle}>Storage</p>
@@ -143,7 +143,7 @@ const SettingsPage = () => {
           <h2 className={styles.sectionTitle}>NOTIFICATIONS</h2>
           <div className={styles.card}>
             <ToggleRow
-              iconSrc={Icon8}
+              iconSrc={Icon7}
               iconAlt="Reminders"
               title="Reminders"
               subtitle=""
@@ -151,7 +151,7 @@ const SettingsPage = () => {
               onToggle={() => onToggle('reminders')}
             />
             <ToggleRow
-              iconSrc={Icon9}
+              iconSrc={Icon6}
               iconAlt="Course updates"
               title="Course Updates"
               subtitle=""
@@ -164,24 +164,24 @@ const SettingsPage = () => {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>PRIVACY &amp; SECURITY</h2>
           <div className={styles.card}>
-            <ChevronRow iconSrc={Icon10} iconAlt="Privacy settings" title="Privacy Settings" subtitle="Control your data visibility" />
+            <ChevronRow iconSrc={Icon5} iconAlt="Privacy settings" title="Privacy Settings" subtitle="Control your data visibility" />
             <ChevronRow iconSrc={Icon13} iconAlt="Two-factor authentication" title="Two-Factor Authentication" subtitle="Add an extra layer of security" />
-            <ChevronRow iconSrc={Icon12} iconAlt="Devices" title="Devices" subtitle="Manage logged-in devices" />
+            <ChevronRow iconSrc={Icon4} iconAlt="Devices" title="Devices" subtitle="Manage logged-in devices" />
           </div>
         </section>
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>SUPPORT &amp; ABOUT</h2>
           <div className={styles.card}>
-            <ChevronRow iconSrc={Icon13} iconAlt="Help center" title="Help Center" subtitle="FAQs and support articles" />
-            <ChevronRow iconSrc={Icon14} iconAlt="Contact support" title="Contact Support" subtitle="Get help from our team" />
+            <ChevronRow iconSrc={Icon3} iconAlt="Help center" title="Help Center" subtitle="FAQs and support articles" />
+            <ChevronRow iconSrc={Icon2} iconAlt="Contact support" title="Contact Support" subtitle="Get help from our team" />
             <div className={styles.rowStatic}>
               <div className={styles.rowLeft}>
                 <div className={styles.iconBox}>
-                  <img className={styles.iconImage} src={Icon15} alt="About EDUlearn" />
+                  <img className={styles.iconImage} src={Icon1} alt="About EDUlearn" />
                 </div>
                 <div className={styles.copyBlock}>
-                  <p className={styles.rowTitle}>About EDUlearn</p>
+                  <p className={styles.rowTitle}>About EduLearn</p>
                   <p className={styles.rowSubtitle}>Version 2.4.1</p>
                 </div>
               </div>
@@ -190,7 +190,7 @@ const SettingsPage = () => {
         </section>
 
         <button type="button" className={styles.logoutButton}>
-          <img className={styles.logoutIcon} src={Icon16} alt="" />
+          <img className={styles.redlockouticon} src={redlockouticon} alt="" />
           Logout
         </button>
 

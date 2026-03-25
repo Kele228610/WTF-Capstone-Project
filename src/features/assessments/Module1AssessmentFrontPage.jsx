@@ -123,6 +123,7 @@ const Module1AssessmentFrontPage = () => {
   }, [pageContext.assessmentSubmoduleId, pageContext.submoduleId]);
 
   const moduleTitle = pageContext.moduleTitle || 'Foundations of Anatomy';
+  const canStartAssessment = !loading && questions.length > 0;
 
   return (
     <div className={styles.page}>
@@ -208,7 +209,7 @@ const Module1AssessmentFrontPage = () => {
               },
             })
           }
-          disabled={loading || Boolean(error)}
+          disabled={!canStartAssessment}
         >
           Start Assessment
         </button>

@@ -75,7 +75,10 @@ const Module1AssessmentFrontPage = () => {
 
   const storedContext = readLessonContext();
 
-  const pageContext = location.state || storedContext || {};
+  const pageContext = {
+    ...(storedContext || {}),
+    ...(location.state || {}),
+  };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 

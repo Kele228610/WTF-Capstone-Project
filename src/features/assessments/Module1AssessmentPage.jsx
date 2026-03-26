@@ -90,7 +90,10 @@ const Module1AssessmentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const storedContext = readLessonContext();
-  const pageContext = location.state || storedContext || {};
+  const pageContext = {
+    ...(storedContext || {}),
+    ...(location.state || {}),
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showResultPopup, setShowResultPopup] = useState(false);
   const [score, setScore] = useState(0);

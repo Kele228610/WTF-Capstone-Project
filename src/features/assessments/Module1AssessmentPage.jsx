@@ -24,14 +24,6 @@ function normalizeOption(option) {
   return { id, label, value };
 }
 
-function normalizeCorrectAnswer(correctAnswer) {
-  if (typeof correctAnswer === 'object' && correctAnswer) {
-    return normalizeOption(correctAnswer).value;
-  }
-
-  return correctAnswer || '';
-}
-
 function normalizeQuestions(data) {
   const payload = extractPayload(data);
   const list = payload?.questions || payload?.quiz || payload?.items || payload;
@@ -250,7 +242,7 @@ const Module1AssessmentPage = () => {
 
               <div className={styles.optionsGrid}>
                 {q.options.map((option) => {
-                  const isSelected = answers[q.id] === option.value;
+                  const isSelected = answers[q.id] === option.id;
                   const optionClass = isSelected ? styles.optionSelected : styles.option;
 
                   return (

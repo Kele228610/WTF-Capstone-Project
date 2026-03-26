@@ -152,6 +152,13 @@
   font-weight: 600;
 }
 
+.pageInfo {
+  margin: 12px 0 0;
+  color: #1d4fbc;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .sectionTitle {
   margin: 26px 2px 16px;
   font-size: 18px;

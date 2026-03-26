@@ -310,7 +310,9 @@ export default function HumanAnatomyLessonNotesPage() {
         quiz,
         context: {
           lessonId: pageContext.lessonId || null,
+          lessonTitle: pageContext.lessonTitle || null,
           moduleId: pageContext.moduleId || null,
+          moduleTitle: pageContext.moduleTitle || null,
           submoduleTitle: submodule.title,
         },
       });

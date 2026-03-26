@@ -19,7 +19,7 @@ import {
   startLessonSession,
 } from '../../api/lessons';
 import { readLessonContext, saveLessonContext } from './lessonContext';
-import { getDownloadedSubmodule } from './offlineLessonStorage';
+import { getDownloadedSubmodule, listDownloadedSubmodules } from './offlineLessonStorage';
 import { readLessonUiState } from './lessonUiState';
 
 function extractPayload(data) {
@@ -103,6 +103,69 @@ function extractProgressValue(data) {
   return 0;
 }
 
+function buildOfflineLessonState(downloadedSubmodules, fallbackContext) {
+  const fallbackLessonId = fallbackContext?.lessonId || null;
+  const filteredSubmodules = downloadedSubmodules.filter((record) => {
+    if (!record?.submodule || !record?.submoduleId) return false;
+    if (!fallbackLessonId) return true;
+    return record?.context?.lessonId === fallbackLessonId;
+  });
+
+  if (filteredSubmodules.length === 0) {
+    throw new Error('No downloaded lessons are available offline yet.');
+  }
+
+  const lessonTitle =
+    filteredSubmodules[0]?.context?.lessonTitle ||
+    fallbackContext?.lessonTitle ||
+    'Human Anatomy';
+  const lessonId = filteredSubmodules[0]?.context?.lessonId || fallbackLessonId || 'offline-lesson';
+  const modulesMap = new Map();
+
+  filteredSubmodules.forEach((record, index) => {
+    const moduleId = record?.context?.moduleId || `offline-module-${index + 1}`;
+    const moduleTitle = record?.context?.moduleTitle || `Downloaded Module ${modulesMap.size + 1}`;
+
+    if (!modulesMap.has(moduleId)) {
+      modulesMap.set(moduleId, {
+        id: moduleId,
+        title: moduleTitle,
+        submodules: [],
+      });
+    }
+
+    const moduleEntry = modulesMap.get(moduleId);
+    moduleEntry.submodules.push(
+      normalizeSubmodule(
+        {
+          ...record.submodule,
+          submoduleId: record.submoduleId,
+        },
+        moduleEntry.submodules.length,
+        moduleTitle
+      )
+    );
+  });
+
+  const modules = Array.from(modulesMap.values()).map(({ submodules, ...moduleEntry }) => moduleEntry);
+  const submodulesByModuleId = Object.fromEntries(
+    Array.from(modulesMap.entries()).map(([moduleId, value]) => [moduleId, value.submodules])
+  );
+  const firstModuleId = modules[0]?.id || null;
+
+  return {
+    lesson: {
+      id: lessonId,
+      title: lessonTitle,
+      subject: fallbackContext?.lessonSubject || 'SCIENCE',
+    },
+    modules,
+    submodulesByModuleId,
+    firstModuleId,
+    moduleIds: modules.map((module) => module.id),
+  };
+}
+
 const HumanAnatomyLessonPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -120,6 +183,7 @@ const HumanAnatomyLessonPage = () => {
   const [loadingModuleId, setLoadingModuleId] = useState(null);
   const [moduleErrors, setModuleErrors] = useState({});
   const [pageError, setPageError] = useState('');
+  const [pageInfo, setPageInfo] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
   const lastLessonLoadKeyRef = useRef('');
   const loadedSubmoduleModuleIdsRef = useRef(new Set());
@@ -140,6 +204,7 @@ const HumanAnatomyLessonPage = () => {
           setPageLoading(true);
         }
         setPageError('');
+        setPageInfo('');
 
         const initialSession = location.state?.session || storedContext?.session;
         const sessionPayload = initialSession || extractPayload(await startLessonSession());
@@ -178,7 +243,31 @@ const HumanAnatomyLessonPage = () => {
         });
       } catch (error) {
         if (cancelled) return;
-        setPageError(error?.message || 'Unable to load lesson.');
+        try {
+          const downloadedSubmodules = await listDownloadedSubmodules();
+          if (cancelled) return;
+
+          const offlineState = buildOfflineLessonState(downloadedSubmodules, {
+            lessonId: location.state?.lessonId || storedContext?.lessonId || null,
+            lessonTitle: location.state?.lessonTitle || storedContext?.lessonTitle || null,
+            lessonSubject: lesson?.courseName || lesson?.subject || 'SCIENCE',
+          });
+
+          setLesson(offlineState.lesson);
+          setModules(offlineState.modules);
+          setOpenModuleId(offlineState.firstModuleId);
+          setModuleProgress(0);
+          setSubmodulesByModuleId(offlineState.submodulesByModuleId);
+          setModuleErrors({});
+          loadedSubmoduleModuleIdsRef.current = new Set(offlineState.moduleIds);
+          lastLessonLoadKeyRef.current = loadKey;
+          setPageError('');
+          setPageInfo('You are offline. Showing downloaded lessons from this device.');
+        } catch (offlineError) {
+          if (cancelled) return;
+          setPageInfo('');
+          setPageError(offlineError?.message || error?.message || 'Unable to load lesson.');
+        }
       } finally {
         if (!cancelled) setPageLoading(false);
       }
@@ -400,6 +489,7 @@ const HumanAnatomyLessonPage = () => {
           <div className={styles.progressTrack}>
             <div className={styles.progressFill} style={{ width: `${progressValue}%` }} />
           </div>
+          {pageInfo ? <p className={styles.pageInfo}>{pageInfo}</p> : null}
           {pageError ? <p className={styles.pageError}>{pageError}</p> : null}
         </section>
 

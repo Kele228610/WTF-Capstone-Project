@@ -52,6 +52,10 @@ export async function getDownloadedSubmodule(submoduleId) {
   return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.get(submoduleId));
 }
 
+export async function listDownloadedSubmodules() {
+  return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.getAll());
+}
+
 export async function saveDownloadedAssessment(record) {
   return runTransaction(ASSESSMENT_STORE, 'readwrite', (store) => store.put(record));
 }

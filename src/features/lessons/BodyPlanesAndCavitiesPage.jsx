@@ -187,17 +187,27 @@ export default function BodyPlanesAndCavitiesPage() {
 
   useEffect(() => {
     const submoduleId = submodule.id || pageContext.submoduleId;
-    if (!submoduleId) return;
+    if (!submoduleId) {
+      setSelectedAnswer(null);
+      setQuizSubmitted(false);
+      setIsCompleted(false);
+      setCompletionMessage('');
+      return;
+    }
 
     const savedState = readLessonUiState(userId, submoduleId);
-    if (!savedState) return;
+    if (!savedState) {
+      setSelectedAnswer(null);
+      setQuizSubmitted(false);
+      setIsCompleted(false);
+      setCompletionMessage('');
+      return;
+    }
 
     setSelectedAnswer(savedState.selectedAnswer || null);
     setQuizSubmitted(Boolean(savedState.quizSubmitted));
     setIsCompleted(Boolean(savedState.isCompleted));
-    if (savedState.completionMessage) {
-      setCompletionMessage(savedState.completionMessage);
-    }
+    setCompletionMessage(savedState.completionMessage || '');
   }, [userId, submodule.id, pageContext.submoduleId]);
 
   const isCorrect = quizSubmitted && answersMatch(selectedAnswer, quiz.correctAnswer);

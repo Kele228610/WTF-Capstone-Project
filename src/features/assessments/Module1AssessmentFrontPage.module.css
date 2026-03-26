@@ -236,12 +236,8 @@
   background: #124CC9;
   color: #fff;
   box-shadow: 0 6px 14px rgba(31, 86, 209, 0.28);
-}
-
-.startIcon {
   display: flex;
   align-items: center;
-  gap: 8px;
   justify-content: center;
 }
 .ResumeIcon {

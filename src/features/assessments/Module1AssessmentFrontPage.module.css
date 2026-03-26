@@ -239,12 +239,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
-.ResumeIcon {
-  font-size: 28px;
-  width: 16px;
-  height: 16px;
+
+.startIcon {
+  width: 20px;
+  height: 20px;
 }
+
 
 /* .startButton:disabled {
   opacity: 0.6;

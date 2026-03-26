@@ -439,6 +439,17 @@ const HumanAnatomyLessonPage = () => {
   const openSubmodule = (module, submodule, index) => {
     const moduleId = getEntityId(module);
     const moduleSubmodules = submodulesByModuleId[moduleId] || [];
+    const previousSubmodule = index > 0 ? moduleSubmodules[index - 1] : null;
+    const previousStatus = previousSubmodule ? submoduleStatusById[previousSubmodule.id] || {} : null;
+    const isLocked =
+      Boolean(previousSubmodule) &&
+      !previousStatus?.isCompleted &&
+      !previousStatus?.isDownloaded;
+
+    if (isLocked) {
+      return;
+    }
+
     const nextSubmodule = moduleSubmodules[index + 1] || null;
     const assessmentSubmodule =
       moduleSubmodules.find((item) => item.isAssessment) || moduleSubmodules[moduleSubmodules.length - 1] || null;
@@ -566,21 +577,27 @@ const HumanAnatomyLessonPage = () => {
               {isModuleLoading ? <p className={styles.pageError}>Loading module content...</p> : null}
               {moduleError ? <p className={styles.pageError}>{moduleError}</p> : null}
 
-              {submodules.map((submodule) => {
+              {submodules.map((submodule, submoduleIndex) => {
                 const isSelected = selectedLessonItem === submodule.id;
                 const rowClass = isSelected ? styles.lessonRowActive : styles.lessonRow;
                 const lessonNameClass = isSelected ? styles.lessonNameActive : styles.lessonName;
                 const icon = submodule.isAssessment ? Question : submodule.hasVideo ? Lessonplay : Notesicon;
                 const persistedStatus = submoduleStatusById[submodule.id] || {};
+                const previousSubmodule = submoduleIndex > 0 ? submodules[submoduleIndex - 1] : null;
+                const previousStatus = previousSubmodule ? submoduleStatusById[previousSubmodule.id] || {} : null;
+                const isLocked =
+                  Boolean(previousSubmodule) &&
+                  !previousStatus?.isCompleted &&
+                  !previousStatus?.isDownloaded;
                 const availabilityLabel = persistedStatus.isCompleted
                   ? 'Completed'
                   : persistedStatus.isDownloaded
                   ? 'Downloaded'
                   : 'Available now';
                 const trailing = submodule.isAssessment ? (
-                  <img className={styles.lockIcon} src={Greylock} alt="Assessment" />
+                  isLocked ? <img className={styles.lockIcon} src={Greylock} alt="Assessment locked" /> : null
                 ) : submodule.hasVideo ? (
-                  <img className={styles.lockIcon} src={Greylock} alt="Video lesson" />
+                  isLocked ? <img className={styles.lockIcon} src={Greylock} alt="Video lesson locked" /> : null
                 ) : (
                   null
                 );
@@ -590,7 +607,7 @@ const HumanAnatomyLessonPage = () => {
                     key={submodule.id}
                     type="button"
                     className={rowClass}
-                    onClick={() => openSubmodule(module, submodule, submodules.indexOf(submodule))}
+                    onClick={() => openSubmodule(module, submodule, submoduleIndex)}
                   >
                     <img
                       className={submodule.isAssessment ? styles.lessonIconLock : submodule.hasVideo ? styles.lessonIconPlay : styles.notesIcon}

@@ -4,7 +4,7 @@ import styles from './Module1AssessmentPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
 import { getModuleAssessment, submitModuleAssessment } from '../../api/lessons';
-import { readLessonContext } from '../lessons/lessonContext';
+import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment } from '../lessons/offlineLessonStorage';
 
 const ASSESSMENT_CACHE_KEY = 'module-all';
@@ -70,11 +70,18 @@ function extractSubmissionMetrics(data, totalQuestions) {
     payload?.success ??
     payload?.data?.passed ??
     payload?.data?.isPassed;
+  const attemptCount =
+    payload?.attemptCount ??
+    payload?.attempts ??
+    payload?.data?.attemptCount ??
+    payload?.data?.attempts ??
+    0;
 
   return {
     score: finalScore,
     percentage: finalPercentage,
     isPassed: typeof passedValue === 'boolean' ? passedValue : totalQuestions > 0 ? finalScore / totalQuestions >= PASS_MARK : false,
+    attemptCount: Number.isFinite(Number(attemptCount)) ? Number(attemptCount) : 0,
   };
 }
 
@@ -167,6 +174,9 @@ const Module1AssessmentPage = () => {
       const popupPercentage = metrics.percentage;
       setDerivedPercentage(popupPercentage);
       setDerivedPassed(metrics.isPassed);
+      saveLessonContext({
+        attemptCount: metrics.attemptCount,
+      });
     } catch (submitError) {
       setError(submitError?.message || 'Unable to submit assessment right now.');
     } finally {

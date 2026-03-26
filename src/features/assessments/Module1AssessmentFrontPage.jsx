@@ -311,7 +311,7 @@ const Module1AssessmentFrontPage = () => {
 
   const [offlineMessage, setOfflineMessage] = useState('');
 
-  const [attempts] = useState(0);
+  const attempts = Number(pageContext.attemptCount ?? 0);
  
   useEffect(() => {
 

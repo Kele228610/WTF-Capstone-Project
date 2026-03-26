@@ -249,7 +249,7 @@ const CurriculumScreen = () => {
         <div className={styles['section-1-my-courses']}>
           <div className={styles['container9']}>
             <div clasName={styles['container2']}>
-              <div className={styles['my-courses']}>My Lesson</div>
+              <div className={styles['my-courses']}>My Lessons</div>
             </div>
             <div className={styles['button3']}>
               <div className={styles['my-courses']}>See All</div>

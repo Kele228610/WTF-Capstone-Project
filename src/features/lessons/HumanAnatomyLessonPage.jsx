@@ -9,7 +9,6 @@ import Greylock from '../../assets/icons/Greylockicon.png';
 import Notesicon from '../../assets/icons/NotesIcon.svg';
 import Lessonplay from '../../assets/icons/Lessonplayicon.png';
 import Question from '../../assets/icons/Questionicon.png';
-import cloudicon from '../../assets/icons/cloud-icon.png';
 import {
   getLessonById,
   getModuleById,
@@ -18,7 +17,7 @@ import {
   getSubmodulesByModuleId,
   startLessonSession,
 } from '../../api/lessons';
-import { getProfile, readStoredProfileIdentity, storeProfileIdentity } from '../../api/profile';
+import { getProfile } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, listDownloadedSubmodules } from './offlineLessonStorage';
 import { readLessonUiState } from './lessonUiState';
@@ -190,7 +189,7 @@ const HumanAnatomyLessonPage = () => {
   const [pageError, setPageError] = useState('');
   const [pageInfo, setPageInfo] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
-  const [userId, setUserId] = useState(() => readStoredProfileIdentity() || 'anonymous');
+  const [userId, setUserId] = useState('anonymous');
   const lastLessonLoadKeyRef = useRef('');
   const loadedSubmoduleModuleIdsRef = useRef(new Set());
 
@@ -202,12 +201,10 @@ const HumanAnatomyLessonPage = () => {
         const data = await getProfile();
         if (cancelled) return;
         const payload = extractPayload(data);
-        const resolvedUserId = payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous';
-        storeProfileIdentity(resolvedUserId);
-        setUserId(resolvedUserId);
+        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
       } catch {
         if (!cancelled) {
-          setUserId(readStoredProfileIdentity() || 'anonymous');
+          setUserId('anonymous');
         }
       }
     }
@@ -583,9 +580,9 @@ const HumanAnatomyLessonPage = () => {
                 const trailing = submodule.isAssessment ? (
                   <img className={styles.lockIcon} src={Greylock} alt="Assessment" />
                 ) : submodule.hasVideo ? (
-                  isSelected ? <div className={styles.statusCircle} /> : null
+                  <img className={styles.lockIcon} src={Greylock} alt="Video lesson" />
                 ) : (
-                  <img className={styles.cloudIcon} src={cloudicon} alt="Reading lesson" />
+                  null
                 );
 
                 return (

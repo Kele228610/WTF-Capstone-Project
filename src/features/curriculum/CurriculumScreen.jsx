@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './CurriculumScreen.module.css';
 import { useNavigate } from 'react-router-dom';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
@@ -50,6 +51,7 @@ function extractProgressValue(payload) {
 
 const CurriculumScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profile, setProfile] = useState(null);
   const [primaryLesson, setPrimaryLesson] = useState(null);
@@ -140,6 +142,7 @@ const CurriculumScreen = () => {
   //  console.log(primaryLesson.description);
   const primaryLessonDescription = primaryLesson?.description || 'Introduction to the Human Body Systems';
   const primaryLessonProgressLabel = `${primaryLessonProgress}%`;
+  const primaryLessonCtaLabel = location.state?.entryFlow === 'new' ? 'Start' : 'Continue';
 
   const handleOpenAssistant = () => setIsAssistantOpen(true);
   const handleCloseAssistant = () => setIsAssistantOpen(false);
@@ -286,7 +289,7 @@ const CurriculumScreen = () => {
                   onClick={handleContinuePrimaryLesson}
                 >
                   <div className={styles['container7']}>
-                    <b className={styles['subjects']}>Start</b>
+                    <b className={styles['subjects']}>{primaryLessonCtaLabel}</b>
                   </div>
                   <div className={styles['container19']} />
                 </button>

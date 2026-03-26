@@ -139,7 +139,7 @@ const NewUserHomePage = () => {
       setStartingLesson(true);
       setLessonStartError('');
       await startLessonSession();
-      navigate('/curriculum');
+      navigate('/curriculum', { state: { entryFlow: 'new' } });
     } catch (error) {
       setLessonStartError(error?.message || 'Unable to start lesson.');
     } finally {

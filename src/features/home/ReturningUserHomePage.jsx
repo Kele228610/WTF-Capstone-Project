@@ -265,7 +265,7 @@ const ReturningUserHomePage = () => {
           <button
             type="button"
             className={styles.button3}
-            onClick={() => navigate('/curriculum')}
+            onClick={() => navigate('/curriculum', { state: { entryFlow: 'returning' } })}
             aria-label="Go to curriculum"
           >
             <div className={styles.buttonshadow} />

@@ -495,14 +495,8 @@ const Module1AssessmentFrontPage = () => {
           <div className={styles.tutorTextWrap}>
 <b className={styles.tutorName}>EduAI Tutor</b>
 <p className={styles.tutorText}>
-
-              Great job completing the module!<br/>
-
-              Before we dive into the assessment,<br/>
-
-              would you like to do a quick 2-<br/>
-
-              minute review of the key concepts?
+Great job completing the module.Before we dive into the assessment, would you like to do a quick 2-
+minute review of the key concepts?
 </p>
 </div>
 </section>

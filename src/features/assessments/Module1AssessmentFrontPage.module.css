@@ -238,6 +238,18 @@
   box-shadow: 0 6px 14px rgba(31, 86, 209, 0.28);
 }
 
+.startIcon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+.ResumeIcon {
+  font-size: 28px;
+  width: 16px;
+  height: 16px;
+}
+
 /* .startButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;

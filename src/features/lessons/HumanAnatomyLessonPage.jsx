@@ -147,7 +147,7 @@ function buildOfflineLessonState(downloadedSubmodules, fallbackContext) {
     );
   });
 
-  const modules = Array.from(modulesMap.values()).map(({ submodules, ...moduleEntry }) => moduleEntry);
+  const modules = Array.from(modulesMap.values()).map(({ ...moduleEntry }) => moduleEntry);
   const submodulesByModuleId = Object.fromEntries(
     Array.from(modulesMap.entries()).map(([moduleId, value]) => [moduleId, value.submodules])
   );

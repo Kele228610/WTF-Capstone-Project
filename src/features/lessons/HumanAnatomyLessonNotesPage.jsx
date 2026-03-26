@@ -12,7 +12,7 @@ import {
   getSubmoduleQuiz,
   markSubmoduleComplete,
 } from '../../api/lessons';
-import { getProfile } from '../../api/profile';
+import { getProfile, getProfileIdentity } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 import { readLessonUiState, saveLessonUiState } from './lessonUiState';
@@ -299,10 +299,11 @@ export default function HumanAnatomyLessonNotesPage() {
     try {
       setDownloading(true);
       setDownloadState('');
+      const resolvedUserId = userId !== 'anonymous' ? userId : (await getProfileIdentity()) || 'anonymous';
 
       const downloadPayload = await downloadSubmoduleProgress(pageContext.submoduleId);
 
-      await saveDownloadedSubmodule(userId, {
+      await saveDownloadedSubmodule(resolvedUserId, {
         submoduleId: pageContext.submoduleId,
         cachedAt: Date.now(),
         downloadPayload,
@@ -316,6 +317,7 @@ export default function HumanAnatomyLessonNotesPage() {
           submoduleTitle: submodule.title,
         },
       });
+      setUserId(resolvedUserId);
 
       setDownloadState('Lesson notes downloaded. This submodule is now available offline.');
     } catch (downloadError) {

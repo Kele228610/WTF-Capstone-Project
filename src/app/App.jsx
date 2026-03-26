@@ -22,6 +22,7 @@ import ProgressTrackerPage from '../features/progress/ProgressTrackerPage';
 import AchievementsPage from '../features/achievements/AchievementsPage';
 import SettingsPage from '../features/settings/SettingsPage';
 import ProfilePage from '../features/profile/ProfilePage';
+import OfflineSyncStatus from '../features/offline/OfflineSyncStatus';
 
 
 import '../styles/global.css';
@@ -29,6 +30,7 @@ import '../styles/global.css';
 const App = () => {
   return (
     <Router>
+      <OfflineSyncStatus />
       <Routes>
 
         {/* ✅ Pages WITH header/footer */}

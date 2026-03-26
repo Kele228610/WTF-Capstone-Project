@@ -1,0 +1,69 @@
+.offlineBanner {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 120;
+  width: min(720px, calc(100% - 24px));
+  border-radius: 14px;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 14px 16px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+  font: 600 14px/1.4 Montserrat, sans-serif;
+  text-align: center;
+}
+
+.syncOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  background: rgba(15, 23, 42, 0.42);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.syncCard {
+  width: min(420px, 100%);
+  border-radius: 24px;
+  background: #f8fafc;
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.3);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.syncSpinner {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  border: 4px solid #c9d8fb;
+  border-top-color: #1f56d1;
+  animation: sync-spin 0.9s linear infinite;
+}
+
+.syncTitle {
+  margin: 0;
+  font: 700 24px/1.2 Montserrat, sans-serif;
+  color: #0f172a;
+}
+
+.syncCopy {
+  margin: 12px 0 0;
+  font: 500 14px/1.5 Montserrat, sans-serif;
+  color: #475569;
+}
+
+.syncMeta {
+  margin: 12px 0 0;
+  font: 700 13px/1.4 Montserrat, sans-serif;
+  color: #1f56d1;
+}
+
+@keyframes sync-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

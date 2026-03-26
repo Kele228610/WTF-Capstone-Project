@@ -17,6 +17,7 @@ import { getProfile } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 import { readLessonUiState, saveLessonUiState } from './lessonUiState';
+import { queueOfflineProgress } from '../offline/offlineSync';
 
 function extractPayload(data) {
   return data?.data || data;
@@ -240,11 +241,23 @@ export default function BodyPlanesAndCavitiesPage() {
 
     try {
       setMarkingComplete(true);
-      await markSubmoduleComplete(submoduleId);
-      setCompletionMessage('Lesson marked as completed successfully.');
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        queueOfflineProgress({ submoduleId, completed: true });
+        setCompletionMessage('You are offline. Completion was saved and will sync when connection returns.');
+      } else {
+        await markSubmoduleComplete(submoduleId);
+        setCompletionMessage('Lesson marked as completed successfully.');
+      }
       setIsCompleted(true);
     } catch (completeError) {
-      setCompletionMessage(completeError?.message || 'Unable to mark this lesson as completed right now.');
+      const message = completeError?.message || '';
+      if (/failed to fetch|network|offline/i.test(message)) {
+        queueOfflineProgress({ submoduleId, completed: true });
+        setIsCompleted(true);
+        setCompletionMessage('Connection lost. Completion was saved offline and will sync later.');
+      } else {
+        setCompletionMessage(completeError?.message || 'Unable to mark this lesson as completed right now.');
+      }
     } finally {
       setMarkingComplete(false);
     }

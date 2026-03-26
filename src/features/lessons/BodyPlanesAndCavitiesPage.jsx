@@ -13,7 +13,7 @@ import {
   getSubmoduleQuiz,
   markSubmoduleComplete,
 } from '../../api/lessons';
-import { getProfile, getProfileIdentity } from '../../api/profile';
+import { getProfile, getProfileIdentity, readStoredProfileIdentity, storeProfileIdentity } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 import { readLessonUiState, saveLessonUiState } from './lessonUiState';
@@ -84,7 +84,7 @@ export default function BodyPlanesAndCavitiesPage() {
   const [downloading, setDownloading] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [userId, setUserId] = useState('anonymous');
+  const [userId, setUserId] = useState(() => readStoredProfileIdentity() || 'anonymous');
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Body Planes and Cavities',
     contentText: '',
@@ -104,10 +104,12 @@ export default function BodyPlanesAndCavitiesPage() {
         const data = await getProfile();
         if (cancelled) return;
         const payload = extractPayload(data);
-        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+        const resolvedUserId = payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous';
+        storeProfileIdentity(resolvedUserId);
+        setUserId(resolvedUserId);
       } catch {
         if (!cancelled) {
-          setUserId('anonymous');
+          setUserId(readStoredProfileIdentity() || 'anonymous');
         }
       }
     }
@@ -299,6 +301,7 @@ export default function BodyPlanesAndCavitiesPage() {
           submoduleTitle: submodule.title,
         },
       });
+      storeProfileIdentity(resolvedUserId);
       setUserId(resolvedUserId);
 
       setDownloadState('Video lesson downloaded. This submodule is now available offline.');

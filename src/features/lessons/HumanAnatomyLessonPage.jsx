@@ -18,7 +18,7 @@ import {
   getSubmodulesByModuleId,
   startLessonSession,
 } from '../../api/lessons';
-import { getProfile } from '../../api/profile';
+import { getProfile, readStoredProfileIdentity, storeProfileIdentity } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, listDownloadedSubmodules } from './offlineLessonStorage';
 import { readLessonUiState } from './lessonUiState';
@@ -190,7 +190,7 @@ const HumanAnatomyLessonPage = () => {
   const [pageError, setPageError] = useState('');
   const [pageInfo, setPageInfo] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
-  const [userId, setUserId] = useState('anonymous');
+  const [userId, setUserId] = useState(() => readStoredProfileIdentity() || 'anonymous');
   const lastLessonLoadKeyRef = useRef('');
   const loadedSubmoduleModuleIdsRef = useRef(new Set());
 
@@ -202,10 +202,12 @@ const HumanAnatomyLessonPage = () => {
         const data = await getProfile();
         if (cancelled) return;
         const payload = extractPayload(data);
-        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+        const resolvedUserId = payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous';
+        storeProfileIdentity(resolvedUserId);
+        setUserId(resolvedUserId);
       } catch {
         if (!cancelled) {
-          setUserId('anonymous');
+          setUserId(readStoredProfileIdentity() || 'anonymous');
         }
       }
     }

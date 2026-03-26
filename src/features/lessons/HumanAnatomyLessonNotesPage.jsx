@@ -12,7 +12,7 @@ import {
   getSubmoduleQuiz,
   markSubmoduleComplete,
 } from '../../api/lessons';
-import { getProfile, getProfileIdentity } from '../../api/profile';
+import { getProfile, getProfileIdentity, readStoredProfileIdentity, storeProfileIdentity } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, saveDownloadedSubmodule } from './offlineLessonStorage';
 import { readLessonUiState, saveLessonUiState } from './lessonUiState';
@@ -90,7 +90,7 @@ export default function HumanAnatomyLessonNotesPage() {
   const [downloading, setDownloading] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [userId, setUserId] = useState('anonymous');
+  const [userId, setUserId] = useState(() => readStoredProfileIdentity() || 'anonymous');
   const [submodule, setSubmodule] = useState({
     title: pageContext.submoduleTitle || 'Introduction to Anatomical Terms',
     contentText: '',
@@ -109,10 +109,12 @@ export default function HumanAnatomyLessonNotesPage() {
         const data = await getProfile();
         if (cancelled) return;
         const payload = extractPayload(data);
-        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+        const resolvedUserId = payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous';
+        storeProfileIdentity(resolvedUserId);
+        setUserId(resolvedUserId);
       } catch {
         if (!cancelled) {
-          setUserId('anonymous');
+          setUserId(readStoredProfileIdentity() || 'anonymous');
         }
       }
     }
@@ -317,6 +319,7 @@ export default function HumanAnatomyLessonNotesPage() {
           submoduleTitle: submodule.title,
         },
       });
+      storeProfileIdentity(resolvedUserId);
       setUserId(resolvedUserId);
 
       setDownloadState('Lesson notes downloaded. This submodule is now available offline.');

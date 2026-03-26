@@ -503,7 +503,7 @@ const HumanAnatomyLessonPage = () => {
         {!pageLoading && modules.length === 0 ? (
           <section className={styles.moduleCollapsed}>
             <div className={styles.moduleNumberMuted}>0</div>
-            <b className={styles.moduleMutedText}>No modules returned from backend</b>
+            <b className={styles.moduleMutedText}>No modules available</b>
             <span className={styles.chevronMuted}>-</span>
           </section>
         ) : null}

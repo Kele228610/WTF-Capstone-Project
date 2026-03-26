@@ -272,7 +272,7 @@ const Module1AssessmentPage = () => {
           {submitting ? 'Submitting...' : 'Submit Assessment'}
         </button>
 
-        <p className={styles.syncText}>Assessment data is loaded from the backend.</p>
+        {/* <p className={styles.syncText}>Assessment data is loaded from the backend.</p> */}
       </main>
 
       {showResultPopup ? (

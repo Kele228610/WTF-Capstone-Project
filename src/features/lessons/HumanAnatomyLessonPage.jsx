@@ -106,11 +106,15 @@ function extractProgressValue(data) {
 
 function buildOfflineLessonState(downloadedSubmodules, fallbackContext) {
   const fallbackLessonId = fallbackContext?.lessonId || null;
-  const filteredSubmodules = downloadedSubmodules.filter((record) => {
+  const validSubmodules = downloadedSubmodules.filter((record) => {
     if (!record?.submodule || !record?.submoduleId) return false;
-    if (!fallbackLessonId) return true;
-    return record?.context?.lessonId === fallbackLessonId;
+    return true;
   });
+
+  const lessonMatchedSubmodules = fallbackLessonId
+    ? validSubmodules.filter((record) => record?.context?.lessonId === fallbackLessonId)
+    : validSubmodules;
+  const filteredSubmodules = lessonMatchedSubmodules.length > 0 ? lessonMatchedSubmodules : validSubmodules;
 
   if (filteredSubmodules.length === 0) {
     throw new Error('No downloaded lessons are available offline yet.');

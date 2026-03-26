@@ -286,7 +286,7 @@ const CurriculumScreen = () => {
                   onClick={handleContinuePrimaryLesson}
                 >
                   <div className={styles['container7']}>
-                    <b className={styles['subjects']}>Continue</b>
+                    <b className={styles['subjects']}>Start</b>
                   </div>
                   <div className={styles['container19']} />
                 </button>
@@ -310,12 +310,12 @@ const CurriculumScreen = () => {
                   <div className={styles['container15']}>
                     <div className={styles['heading-1']}>
                       <div className={styles['lessons-available-offline-container']}>
-                        <span className={styles['lessons']}>{`5/15 Lessons   `}</span>
+                        <span className={styles['lessons']}>{`1/2 Lessons   `}</span>
                         <span className={styles['available-offline']}> Available Offline</span>
                       </div>
                     </div>
                     <div className={styles['container17']}>
-                      <div className={styles['div2']}>33%</div>
+                      <div className={styles['div2']}>0%</div>
                     </div>
                   </div>
                   <div className={styles['background']}>
@@ -324,7 +324,7 @@ const CurriculumScreen = () => {
                 </div>
                 <div className={styles['button5']}>
                   <div className={styles['container7']}>
-                    <b className={styles['subjects']}>Continue</b>
+                    <b className={styles['subjects']}>Start</b>
                   </div>
                 </div>
               </div>

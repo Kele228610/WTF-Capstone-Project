@@ -160,7 +160,7 @@ export default function HumanAnatomyLessonNotesPage() {
       } catch (loadError) {
         if (cancelled) return;
         try {
-          const cached = await getDownloadedSubmodule(pageContext.submoduleId);
+          const cached = await getDownloadedSubmodule(userId, pageContext.submoduleId);
           if (cancelled) return;
 
           if (cached?.submodule) {
@@ -186,7 +186,7 @@ export default function HumanAnatomyLessonNotesPage() {
     return () => {
       cancelled = true;
     };
-  }, [pageContext.submoduleId]);
+  }, [pageContext.submoduleId, userId]);
 
   useEffect(() => {
     const submoduleId = submodule.id || pageContext.submoduleId;
@@ -302,7 +302,7 @@ export default function HumanAnatomyLessonNotesPage() {
 
       const downloadPayload = await downloadSubmoduleProgress(pageContext.submoduleId);
 
-      await saveDownloadedSubmodule({
+      await saveDownloadedSubmodule(userId, {
         submoduleId: pageContext.submoduleId,
         cachedAt: Date.now(),
         downloadPayload,

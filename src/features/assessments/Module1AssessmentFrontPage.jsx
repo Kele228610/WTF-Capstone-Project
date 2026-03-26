@@ -230,6 +230,7 @@ import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
 
 import { getModuleAssessment } from '../../api/lessons';
+import { getProfile } from '../../api/profile';
 
 import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
 
@@ -310,8 +311,47 @@ const Module1AssessmentFrontPage = () => {
   const [loading, setLoading] = useState(true);
 
   const [offlineMessage, setOfflineMessage] = useState('');
+  const [userId, setUserId] = useState('anonymous');
 
   const attempts = Number(pageContext.attemptCount ?? 0);
+
+  useEffect(() => {
+
+    let cancelled = false;
+
+    async function loadProfileIdentity() {
+
+      try {
+
+        const data = await getProfile();
+
+        if (cancelled) return;
+
+        const payload = extractPayload(data);
+
+        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+
+      } catch {
+
+        if (!cancelled) {
+
+          setUserId('anonymous');
+
+        }
+
+      }
+
+    }
+
+    loadProfileIdentity();
+
+    return () => {
+
+      cancelled = true;
+
+    };
+
+  }, []);
  
   useEffect(() => {
 
@@ -341,7 +381,7 @@ const Module1AssessmentFrontPage = () => {
 
         });
  
-        await saveDownloadedAssessment({
+        await saveDownloadedAssessment(userId, {
 
           assessmentSubmoduleId: ASSESSMENT_CACHE_KEY,
 
@@ -367,7 +407,7 @@ const Module1AssessmentFrontPage = () => {
  
         try {
 
-          const cached = await getDownloadedAssessment(ASSESSMENT_CACHE_KEY);
+          const cached = await getDownloadedAssessment(userId, ASSESSMENT_CACHE_KEY);
 
           if (cancelled) return;
  
@@ -401,7 +441,7 @@ const Module1AssessmentFrontPage = () => {
 
     };
 
-  }, [pageContext.moduleTitle]);
+  }, [pageContext.moduleTitle, userId]);
  
   const moduleTitle = pageContext.moduleTitle || 'Foundations of Anatomy';
 

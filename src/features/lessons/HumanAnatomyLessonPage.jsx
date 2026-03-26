@@ -18,6 +18,7 @@ import {
   getSubmodulesByModuleId,
   startLessonSession,
 } from '../../api/lessons';
+import { getProfile } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
 import { getDownloadedSubmodule, listDownloadedSubmodules } from './offlineLessonStorage';
 import { readLessonUiState } from './lessonUiState';
@@ -185,8 +186,32 @@ const HumanAnatomyLessonPage = () => {
   const [pageError, setPageError] = useState('');
   const [pageInfo, setPageInfo] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
+  const [userId, setUserId] = useState('anonymous');
   const lastLessonLoadKeyRef = useRef('');
   const loadedSubmoduleModuleIdsRef = useRef(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfileIdentity() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        const payload = extractPayload(data);
+        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+      } catch {
+        if (!cancelled) {
+          setUserId('anonymous');
+        }
+      }
+    }
+
+    loadProfileIdentity();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -244,7 +269,7 @@ const HumanAnatomyLessonPage = () => {
       } catch (error) {
         if (cancelled) return;
         try {
-          const downloadedSubmodules = await listDownloadedSubmodules();
+          const downloadedSubmodules = await listDownloadedSubmodules(userId);
           if (cancelled) return;
 
           const offlineState = buildOfflineLessonState(downloadedSubmodules, {
@@ -278,7 +303,7 @@ const HumanAnatomyLessonPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [lesson, location.state?.lessonId, location.state?.moduleId, location.state?.session, modules.length, storedContext?.lessonId, storedContext?.moduleId, storedContext?.session]);
+  }, [lesson, location.state?.lessonId, location.state?.moduleId, location.state?.session, modules.length, storedContext?.lessonId, storedContext?.moduleId, storedContext?.session, userId]);
 
   useEffect(() => {
     if (!openModuleId) return undefined;
@@ -379,8 +404,8 @@ const HumanAnatomyLessonPage = () => {
 
       const entries = await Promise.all(
         submodules.map(async (submodule) => {
-          const savedUiState = readLessonUiState('anonymous', submodule.id);
-          const cachedSubmodule = await getDownloadedSubmodule(submodule.id);
+          const savedUiState = readLessonUiState(userId, submodule.id);
+          const cachedSubmodule = await getDownloadedSubmodule(userId, submodule.id);
 
           return [
             submodule.id,
@@ -401,7 +426,7 @@ const HumanAnatomyLessonPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [submodulesByModuleId]);
+  }, [submodulesByModuleId, userId]);
 
   const lessonTitle = lesson?.title || 'Human Anatomy';
   const lessonSubject = lesson?.courseName || lesson?.subject || 'SCIENCE';

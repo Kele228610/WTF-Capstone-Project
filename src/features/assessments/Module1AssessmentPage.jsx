@@ -4,6 +4,7 @@ import styles from './Module1AssessmentPage.module.css';
 import Notificationbell from '../../assets/icons/Notificationbell.png';
 import AsideSidebarDrawerNavigation from '../../components/layout/AsideSidebarDrawerNavigation';
 import { getModuleAssessment, submitModuleAssessment } from '../../api/lessons';
+import { getProfile } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from '../lessons/lessonContext';
 import { getDownloadedAssessment } from '../lessons/offlineLessonStorage';
 
@@ -99,6 +100,30 @@ const Module1AssessmentPage = () => {
   const [error, setError] = useState('');
   const [offlineMessage, setOfflineMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [userId, setUserId] = useState('anonymous');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfileIdentity() {
+      try {
+        const data = await getProfile();
+        if (cancelled) return;
+        const payload = extractPayload(data);
+        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+      } catch {
+        if (!cancelled) {
+          setUserId('anonymous');
+        }
+      }
+    }
+
+    loadProfileIdentity();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,7 +141,7 @@ const Module1AssessmentPage = () => {
       } catch (loadError) {
         if (cancelled) return;
         try {
-          const cached = await getDownloadedAssessment(pageContext.assessmentCacheKey || ASSESSMENT_CACHE_KEY);
+          const cached = await getDownloadedAssessment(userId, pageContext.assessmentCacheKey || ASSESSMENT_CACHE_KEY);
           if (cancelled) return;
 
           if (Array.isArray(cached?.questions) && cached.questions.length > 0) {
@@ -140,7 +165,7 @@ const Module1AssessmentPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [pageContext.assessmentCacheKey, questions.length]);
+  }, [pageContext.assessmentCacheKey, questions.length, userId]);
 
   const selectOption = (questionId, optionId) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }));

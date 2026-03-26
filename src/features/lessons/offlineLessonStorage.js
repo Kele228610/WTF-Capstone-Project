@@ -1,7 +1,11 @@
 const DB_NAME = 'edulearn-offline';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const SUBMODULE_STORE = 'downloaded-submodules';
 const ASSESSMENT_STORE = 'downloaded-assessments';
+
+function buildOfflineKey(userId, itemId) {
+  return `${userId || 'anonymous'}:${itemId}`;
+}
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -9,13 +13,21 @@ function openDatabase() {
 
     request.onupgradeneeded = () => {
       const db = request.result;
+      if (db.objectStoreNames.contains(SUBMODULE_STORE)) {
+        db.deleteObjectStore(SUBMODULE_STORE);
+      }
       if (!db.objectStoreNames.contains(SUBMODULE_STORE)) {
-        const store = db.createObjectStore(SUBMODULE_STORE, { keyPath: 'submoduleId' });
+        const store = db.createObjectStore(SUBMODULE_STORE, { keyPath: 'offlineKey' });
         store.createIndex('cachedAt', 'cachedAt');
+        store.createIndex('userId', 'userId');
+      }
+      if (db.objectStoreNames.contains(ASSESSMENT_STORE)) {
+        db.deleteObjectStore(ASSESSMENT_STORE);
       }
       if (!db.objectStoreNames.contains(ASSESSMENT_STORE)) {
-        const store = db.createObjectStore(ASSESSMENT_STORE, { keyPath: 'assessmentSubmoduleId' });
+        const store = db.createObjectStore(ASSESSMENT_STORE, { keyPath: 'offlineKey' });
         store.createIndex('cachedAt', 'cachedAt');
+        store.createIndex('userId', 'userId');
       }
     };
 
@@ -44,22 +56,38 @@ function runTransaction(storeName, mode, handler) {
   }));
 }
 
-export async function saveDownloadedSubmodule(record) {
-  return runTransaction(SUBMODULE_STORE, 'readwrite', (store) => store.put(record));
+export async function saveDownloadedSubmodule(userId, record) {
+  return runTransaction(SUBMODULE_STORE, 'readwrite', (store) =>
+    store.put({
+      ...record,
+      userId: userId || 'anonymous',
+      offlineKey: buildOfflineKey(userId, record.submoduleId),
+    })
+  );
 }
 
-export async function getDownloadedSubmodule(submoduleId) {
-  return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.get(submoduleId));
+export async function getDownloadedSubmodule(userId, submoduleId) {
+  return runTransaction(SUBMODULE_STORE, 'readonly', (store) =>
+    store.get(buildOfflineKey(userId, submoduleId))
+  );
 }
 
-export async function listDownloadedSubmodules() {
-  return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.getAll());
+export async function listDownloadedSubmodules(userId) {
+  return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.index('userId').getAll(userId || 'anonymous'));
 }
 
-export async function saveDownloadedAssessment(record) {
-  return runTransaction(ASSESSMENT_STORE, 'readwrite', (store) => store.put(record));
+export async function saveDownloadedAssessment(userId, record) {
+  return runTransaction(ASSESSMENT_STORE, 'readwrite', (store) =>
+    store.put({
+      ...record,
+      userId: userId || 'anonymous',
+      offlineKey: buildOfflineKey(userId, record.assessmentSubmoduleId),
+    })
+  );
 }
 
-export async function getDownloadedAssessment(assessmentSubmoduleId) {
-  return runTransaction(ASSESSMENT_STORE, 'readonly', (store) => store.get(assessmentSubmoduleId));
+export async function getDownloadedAssessment(userId, assessmentSubmoduleId) {
+  return runTransaction(ASSESSMENT_STORE, 'readonly', (store) =>
+    store.get(buildOfflineKey(userId, assessmentSubmoduleId))
+  );
 }

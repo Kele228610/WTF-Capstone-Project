@@ -17,10 +17,13 @@ import {
 export default function CreateAccountForm() {
   const navigate = useNavigate();
   const location = useLocation();
+  const shouldRestoreOnboarding = Boolean(location.state?.startOnboarding);
   const prefill =
-    location.state?.prefill && typeof location.state.prefill === 'object'
+    shouldRestoreOnboarding && location.state?.prefill && typeof location.state.prefill === 'object'
       ? location.state.prefill
-      : readPendingOnboarding()?.prefill || {};
+      : shouldRestoreOnboarding
+      ? readPendingOnboarding()?.prefill || {}
+      : {};
 
   const [formData, setFormData] = useState({
     fullName: prefill.fullName || '',
@@ -29,7 +32,7 @@ export default function CreateAccountForm() {
     location: prefill.location || '',
   });
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(location.state?.startOnboarding || false);
+  const [showOnboarding, setShowOnboarding] = useState(shouldRestoreOnboarding);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [classLevel, setClassLevel] = useState('senior');
   const [selectedSubjects, setSelectedSubjects] = useState([]);

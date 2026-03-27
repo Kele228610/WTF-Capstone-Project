@@ -12,7 +12,7 @@ import Bluequestion from '../../assets/icons/Bluequestion.png';
 import Notebook from '../../assets/icons/Notebook.png';
 import { sendAiChat } from '../../api/ai';
 import { getProfile } from '../../api/profile';
-import { getModuleProgress, startLessonSession } from '../../api/lessons';
+import { getCompletedSubmodules, getModuleProgress, startLessonSession } from '../../api/lessons';
 
 function getCurrentTime() {
   const now = new Date();
@@ -60,6 +60,22 @@ function extractProgressValue(payload) {
   return 0;
 }
 
+function extractCompletedSubmodulesCount(payload) {
+  if (Array.isArray(payload)) return payload.length;
+  if (Array.isArray(payload?.completedSubmodules)) return payload.completedSubmodules.length;
+  if (Array.isArray(payload?.submodules)) return payload.submodules.length;
+
+  const count =
+    payload?.count ??
+    payload?.completedCount ??
+    payload?.completedSubmodulesCount ??
+    payload?.totalCompleted ??
+    0;
+
+  const numericCount = Number(count);
+  return Number.isFinite(numericCount) ? numericCount : 0;
+}
+
 const ReturningUserHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
@@ -69,6 +85,7 @@ const ReturningUserHomePage = () => {
   const [assistantError, setAssistantError] = useState('');
   const [profile, setProfile] = useState(null);
   const [moduleProgress, setModuleProgress] = useState(0);
+  const [completedLessonsCount, setCompletedLessonsCount] = useState(0);
   const navigate = useNavigate();
 
   const handleOpenSidebar = () => setIsSidebarOpen(true);
@@ -115,18 +132,25 @@ const ReturningUserHomePage = () => {
         const moduleId = extractModuleId(sessionPayload);
 
         let progressValue = 0;
+        let completedCount = 0;
         if (moduleId) {
-          const progressData = await getModuleProgress(moduleId);
+          const [progressData, completedSubmodulesData] = await Promise.all([
+            getModuleProgress(moduleId),
+            getCompletedSubmodules(moduleId),
+          ]);
           progressValue = extractProgressValue(extractPayload(progressData));
+          completedCount = extractCompletedSubmodulesCount(extractPayload(completedSubmodulesData));
         }
 
         if (cancelled) return;
         setProfile(extractPayload(profileData));
         setModuleProgress(progressValue);
+        setCompletedLessonsCount(completedCount);
       } catch {
         if (!cancelled) {
           setProfile(null);
           setModuleProgress(0);
+          setCompletedLessonsCount(0);
         }
       }
     }
@@ -287,7 +311,7 @@ const ReturningUserHomePage = () => {
         <div className={styles['backgroundbordershadow-parent']}>
           <div className={styles.backgroundbordershadow}>
             <div className={styles.container11}>
-              <b className={styles['welcome-back-winnie']}>24</b>
+              <b className={styles['welcome-back-winnie']}>{completedLessonsCount}</b>
             </div>
 
             <div className={styles.container12}>

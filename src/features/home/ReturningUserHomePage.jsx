@@ -272,9 +272,9 @@ const ReturningUserHomePage = () => {
             <b className={styles['welcome-back-winnie']}>Human Anatomy</b>
           </div>
 
-          <div className={styles.container7}>
+          {/* <div className={styles.container7}>
             <div className={styles.edulearn}>Body Planes and Cavities</div>
-          </div>
+          </div> */}
 
           <div className={styles.container8}>
             <div className={styles.overlay2}>

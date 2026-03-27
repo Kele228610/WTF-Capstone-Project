@@ -76,6 +76,10 @@ export async function listDownloadedSubmodules(userId) {
   return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.index('userId').getAll(userId || 'anonymous'));
 }
 
+export async function listAllDownloadedSubmodules() {
+  return runTransaction(SUBMODULE_STORE, 'readonly', (store) => store.getAll());
+}
+
 export async function saveDownloadedAssessment(userId, record) {
   return runTransaction(ASSESSMENT_STORE, 'readwrite', (store) =>
     store.put({

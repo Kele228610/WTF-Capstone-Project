@@ -17,9 +17,9 @@ import {
   getSubmodulesByModuleId,
   startLessonSession,
 } from '../../api/lessons';
-import { getProfile } from '../../api/profile';
+import { getProfile, readStoredProfileIdentity, storeProfileIdentity } from '../../api/profile';
 import { readLessonContext, saveLessonContext } from './lessonContext';
-import { getDownloadedSubmodule, listDownloadedSubmodules } from './offlineLessonStorage';
+import { getDownloadedSubmodule, listAllDownloadedSubmodules, listDownloadedSubmodules } from './offlineLessonStorage';
 import { readLessonUiState } from './lessonUiState';
 
 function extractPayload(data) {
@@ -189,7 +189,7 @@ const HumanAnatomyLessonPage = () => {
   const [pageError, setPageError] = useState('');
   const [pageInfo, setPageInfo] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
-  const [userId, setUserId] = useState('anonymous');
+  const [userId, setUserId] = useState(() => readStoredProfileIdentity() || 'anonymous');
   const lastLessonLoadKeyRef = useRef('');
   const loadedSubmoduleModuleIdsRef = useRef(new Set());
 
@@ -201,10 +201,12 @@ const HumanAnatomyLessonPage = () => {
         const data = await getProfile();
         if (cancelled) return;
         const payload = extractPayload(data);
-        setUserId(payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous');
+        const resolvedUserId = payload?.id || payload?._id || payload?.userId || payload?.studentId || 'anonymous';
+        storeProfileIdentity(resolvedUserId);
+        setUserId(resolvedUserId);
       } catch {
         if (!cancelled) {
-          setUserId('anonymous');
+          setUserId(readStoredProfileIdentity() || 'anonymous');
         }
       }
     }
@@ -233,6 +235,10 @@ const HumanAnatomyLessonPage = () => {
         }
         setPageError('');
         setPageInfo('');
+
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          throw new Error('Offline');
+        }
 
         const initialSession = location.state?.session || storedContext?.session;
         const sessionPayload = initialSession || extractPayload(await startLessonSession());
@@ -273,9 +279,11 @@ const HumanAnatomyLessonPage = () => {
         if (cancelled) return;
         try {
           const downloadedSubmodules = await listDownloadedSubmodules(userId);
+          const fallbackDownloadedSubmodules =
+            downloadedSubmodules.length > 0 ? downloadedSubmodules : await listAllDownloadedSubmodules();
           if (cancelled) return;
 
-          const offlineState = buildOfflineLessonState(downloadedSubmodules, {
+          const offlineState = buildOfflineLessonState(fallbackDownloadedSubmodules, {
             lessonId: location.state?.lessonId || storedContext?.lessonId || null,
             lessonTitle: location.state?.lessonTitle || storedContext?.lessonTitle || null,
             lessonSubject: lesson?.courseName || lesson?.subject || 'SCIENCE',
@@ -408,7 +416,9 @@ const HumanAnatomyLessonPage = () => {
       const entries = await Promise.all(
         submodules.map(async (submodule) => {
           const savedUiState = readLessonUiState(userId, submodule.id);
-          const cachedSubmodule = await getDownloadedSubmodule(userId, submodule.id);
+          const cachedSubmodule =
+            (await getDownloadedSubmodule(userId, submodule.id)) ||
+            (await getDownloadedSubmodule('anonymous', submodule.id));
 
           return [
             submodule.id,
